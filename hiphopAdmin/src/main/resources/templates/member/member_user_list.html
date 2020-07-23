@@ -1,0 +1,116 @@
+<!DOCTYPE html >
+<html lang="en" th:replace="common/base (title='会员用户列表')">
+<!-- layout文件路径-->
+<div th:fragment="content">
+    <ol class="breadcrumb">
+        <li>当前位置:会员用户查询</li>
+    </ol>
+    <div class="container-fluid" style="padding-left: 0px;">
+        <div class="well">
+            <div class="form-group" style="line-height: 32px;width: 100%">
+                <div class="row">
+                    <span class="control-label col-md-2" style="text-align: right;">用户状态</span>
+                    <div style="width:200px" class="col-sm-3">
+                        <select id="user_status_select" class="form-control">
+                            <option disabled="disabled">---请选择---</option>
+                            <option value="0">全部</option>
+                            <option value="1">使用中</option>
+                            <option value="2">已注销</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="scrollContent" style="width: 99%">
+        <form id="query_member_form" name="form" method="post" action="/member/query_page">
+            <table align="center" class="table table-hover table-striped" id="dataTables-example"
+                   style="table-layout:fixed;" expandable="true" width="100%">
+                <thead>
+                <tr>
+                    <th width="5%">
+                        <span>序号</span>
+                    </th>
+                    <th width="20%">
+                        <span>邮箱</span>
+                    </th>
+                    <th width="15%">
+                        <span>用户名</span>
+                    </th>
+                    <th width="10%">
+                        <span>用户状态</span>
+                    </th>
+                    <th width="10%">
+                        <span>注册时间</span>
+                    </th>
+                    <th width="20%">
+                        <span>操作</span>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(page.records)}">
+                    <td colspan="6" style="text-align: center;color: #FF0000">没有查询到任何会员用户数据</td>
+                </tr>
+                <tr th:if="${not #lists.isEmpty(page.records)}" th:each="member:${page.records}">
+                    <td th:text="${memberStat.index+1}"></td>
+                    <td th:text="${member.email}"></td>
+                    <td th:text="${member.username}"></td>
+                    <td th:text="${1==member.userStatus?'使用中':'已停用'}"></td>
+                    <td th:text="${member.regTime!=null?#dates.format(member.regTime, 'yyyy-MM-dd HH:mm:ss'):'未知'}"></td>
+                    <td th:switch="${member.userStatus}">
+                        <button th:case="1" type="button" class="btn btn-link" th:data-member-id="${member.memberId}" th:data-email="${member.email}" onclick="setMemberStatus(this,2)">停用
+                        </button>
+                        <button th:case="2" type="button" class="btn btn-link" th:data-member-id="${member.memberId}" th:data-email="${member.email}" onclick="setMemberStatus(this,1)">复用
+                        </button>
+                        <span th:case="*">使用状态错误</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div></div>
+            <div th:replace="common/page::pageContext"></div>
+            <!-- 使用状态-->
+            <input type="hidden" id="user_status" name="user_status"/>
+        </form>
+    </div>
+    <div class="modal fade" id="productInfoDialog" tabindex="-1" role="dialog" aria-labelledby="versionEditLabel"
+         aria-hidden="true"></div>
+
+    <script type="text/javascript" th:inline="javascript">
+        //初始化用户状态
+        var userStatus = [[${page.criteriaMap==null?-1:page.criteriaMap['user_status']}]];
+        userStatus=userStatus==null?"-1":userStatus;
+        $("#user_status_select").find('option[value="'+userStatus+'"]').attr("selected", true);
+        $("#user_status").val(userStatus);
+        $(function () {
+            $("#user_status_select").change(function () {
+                var userStatus = $("#user_status_select").val()
+                $("#user_status").val(userStatus);
+                $("#pageNum").val(1);//改变选项后,设置当前页号为1
+                $("#query_member_form").submit();
+            });
+        });
+
+        /**
+         * 设置会员用户状态,即停用或复用会员用户
+         */
+        function setMemberStatus(dom,userStatus) {
+            var memberId = $(dom).data('member-id');
+            var email=$(dom).data('email');
+            if (!(2 == userStatus || 1 == userStatus)) {
+                alert('会员用户状态错误');
+                return;
+            }
+            var message = 2 == userStatus ? '确定注销会员用户【'+email+'】吗?' : '确定复用会员用户【'+email+'】吗?'
+
+            if (window.confirm('确定注销该会员用户吗?')) {
+                var current=$("#pageNum").val();
+                var url = window.webContextPath + '/member/set_member_status?user_status='+userStatus+'&amp;current='+current+'&amp;member_id=' + memberId + '&amp;rd=' + Math.random();
+                url = replaceSpecialChars(url);
+                window.location.href = url;
+            }
+        }
+    </script>
+</div>
+</html>

@@ -1,0 +1,82 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span> <span class="sr-only">Close</span>
+            </button>
+            <h4 class="modal-title" >视频详细信息</h4>
+        </div>
+        <div class="modal-body">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">标题</label>
+                    <div class="col-sm-5">
+                        <span th:text="${videoMap['video_name']}" ></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">视频标签</label>
+                    <div class="col-sm-5">
+                        <span th:text="${videoMap['tags']}" ></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label  class="col-sm-3 control-label">视频分类</label>
+                    <div class="col-sm-5">
+                        <span th:text="${videoMap['dict_name']}" ></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">视频链接</label>
+                    <div class="col-sm-5">
+                        <span th:text="${videoMap['video_url']}" ></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label  class="col-sm-3 control-label">视频描述</label>
+                    <div class="col-sm-5">
+                        <span th:text="${videoMap['video_desc']}" ></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">审核状态</label>
+                    <div class="col-sm-5" th:switch="${videoMap['check_status']}">
+                        <span th:case="1">未审核(新增)</span>
+                        <span th:case="2">审核失败(新增)</span>
+                        <span th:case="3">审核成功(新增)</span>
+                        <span th:case="4">未审核(修改)</span>
+                        <span th:case="5">审核失败(修改)</span>
+                        <span th:case="6">审核成功(修改)</span>
+                        <span th:case="*">未知审核状态</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">视频状态</label>
+                    <div class="col-sm-5" th:switch="${videoMap['video_status']}">
+                        <span th:case="1">正常</span>
+                        <span th:case="2">已下架</span>
+                        <span th:case="3">审核中</span>
+                        <span th:case="4">审核失败</span>
+                        <span th:case="5">已屏蔽</span>
+                        <span th:case="*">未知视频状态</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label  class="col-sm-3 control-label">发布者</label>
+                    <div class="col-sm-5">
+                        <span th:text="${videoMap['email']}" ></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label  class="col-sm-3 control-label">上传时间</label>
+                    <div class="col-sm-5">
+                       <span th:text="${videoMap['upload_time']!=null?#dates.format(videoMap['upload_time'], 'yyyy-MM-dd HH:mm:ss'):'未知'}"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="btn btn-default" data-dismiss="modal" id="dialogng">关闭</div>
+            </div>
+        </div>
+    </div>
+</div>

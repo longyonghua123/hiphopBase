@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>搜索</title>
+</head>
+<body>
+<div class="top_bar" th:fragment="searchContent">
+    <div class="wrap">
+        <div class="left searchbar">
+            <div class="searchoption">
+                <ul id="search_tag_ul">
+                    <li><a href="javascript:;" data-search-tag="article" data-url="/article/search">文章</a></li>
+                    <li><a href="javascript:;" data-search-tag="video" data-url="/video/search">视频</a></li>
+                    <li><a href="javascript:;" data-search-tag="perform" data-url="/perform/search">演出</a></li>
+                </ul>
+            </div>
+            <div class="searchinput">
+                <form id="search_form" action="#" method="get">
+                    <input type="hidden" id="current" name="current" th:value="${page!=null?page.current:'1'}"/>
+                    <input type="button" id="search_but" class="right"/>
+                    <input type="search"  name="kd" th:value="${param.kd!=null?param.kd[0]:''}"  class="left" style="border-radius:5px ;" placeholder="请先选择上方检索类型，再输入检索关键词"/>
+                    <div class="clear">
+                    </div>
+                    <script th:inline="javascript">
+                        $(function () {
+                            var path = window.location.pathname;
+                            var find = false;
+                            var searchUrl = "";
+                            $("#search_tag_ul li").each(function () {
+                                var tag = $(this).find('a').data("search-tag");
+                                if (path.startsWith('/' + tag)) {
+                                    find = true;
+                                    $(this).find('a').addClass('curr');
+                                    searchUrl = $(this).find('a').data("url");
+                                }
+                            });
+                            if (!find) {
+                                $("#search_tag_ul li:first").find('a').addClass('curr');
+                                searchUrl = $("#search_tag_ul li:first").find('a').data("url");
+                            }
+                            //初始化查询
+                            $('#search_form').attr('action', searchUrl);
+                            $("#search_tag_ul li").each(function () {
+                                $(this).find('a').click(function () {
+                                    $('#search_form').attr('action', $(this).data('url'));
+                                });
+                            });
+                            $('#search_but').click(function(){
+                                $('#search_form').submit();
+                            });
+                        });
+                    </script>
+                </form>
+            </div>
+        </div>
+        <div class="clear">
+        </div>
+    </div>
+</div>
+</body>
+</html>

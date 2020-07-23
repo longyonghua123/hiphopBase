@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>菜单</title>
+    <link th:href="${#httpServletRequest.getContextPath()+'/res/skin/css/style.css'}" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" th:src="${#httpServletRequest.getContextPath()+'/res/skin/js/jquery.js'}"></script>
+    <script type="text/javascript" th:inline="javascript">
+        //WEB根目录
+        window.webContextPath = [[${#httpServletRequest.getContextPath()}]];
+        $(function () {
+            getManagerMenus();
+        });
+
+        /**
+         * 获取系统功能菜单
+         **/
+        function getManagerMenus() {
+            $.ajax({
+                url: window.webContextPath + "/menu/load_fun_menu",
+                type: "GET",
+                dataType: "json",
+                success: function (jsonData) {
+                    if (0 != jsonData.status) {
+                        alert("获取管理员菜单失败['" + jsonData.message + "']");
+                    } else {
+                        var mainMenus = jsonData.data;
+                        var len = mainMenus.length;
+                        for (var index = 0; index < len; index++) {
+                            var menuHTML = getMenuHTML(mainMenus[index]);
+                            $(".leftmenu").append(menuHTML);
+                        }
+                        //导航切换
+                        $(".menuson li").click(function () {
+                            $(".menuson li.active").removeClass("active");
+                            $(this).addClass("active");
+                        });
+
+                        $('.title').click(function () {
+                            var $ul = $(this).next('ul');
+                            $('dd').find('ul').slideUp();
+                            if ($ul.is(':visible')) {
+                                $(this).next('ul').slideUp();
+                            } else {
+                                $(this).next('ul').slideDown();
+                            }
+                        });
+                    }
+                },
+                error: function () {
+                    alert("获取管理员菜单失败");
+                }
+            });
+
+        }
+
+        /**
+         * 添加菜单
+         * @param {Object} menuJson
+         */
+        function getMenuHTML(menuJson) {
+            var htmlTemp = '<dd><div class="title"><span></span><img src="{basePath}/res/skin/images/leftico03.png"/>{main_menu_name}</div> <ul class="menuson">{sub_menu_lis}</ul></dd>';
+            var main_menu_name = menuJson.menu_name;
+            htmlTemp = htmlTemp.replace("{main_menu_name}", main_menu_name);
+            htmlTemp = htmlTemp.replace("{basePath}", window.webContextPath);
+            var sub_menus = menuJson.sub_menus;
+            var sub_menu_lis = "";
+            var len = sub_menus.length;
+            var userRole=[[${session.sysUser.userRole}]];
+            for (var index = 0; index < len; index++) {
+                sub_menu = sub_menus[index];
+                if(0==userRole&& sub_menu.menu_url=='/admin/query_sys_users'){
+                   return;
+                }
+                var sub_menu_li = '<li><cite></cite><a href="{menu_url}" target="rightFrame">{sub_menu_name}</a><i></i></li>';
+                var menu_url = sub_menu.menu_url;
+                var sub_menu_name = sub_menu.menu_name;
+                sub_menu_li = sub_menu_li.replace("{menu_url}", window.webContextPath
+                    + menu_url);
+                sub_menu_li = sub_menu_li
+                    .replace("{sub_menu_name}", sub_menu_name);
+                sub_menu_lis += sub_menu_li;
+            }
+            htmlTemp = htmlTemp.replace("{sub_menu_lis}", sub_menu_lis);
+            return htmlTemp;
+        }
+    </script>
+</head>
+<body style="background:#f0f9fd;">
+<div class="lefttop"><span></span>功能菜单</div>
+<dl class="leftmenu">
+</dl>
+</body>
+</html>

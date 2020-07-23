@@ -1,0 +1,45 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /
+    session:
+      timeout: 300
+spring:
+  thymeleaf:
+    prefix: classpath:/templates/
+    cache: false # 开发时关闭缓存,不然没法看到实时页面
+    encoding: UTF-8
+    #mode: LEGACYHTML5  # 用非严格的 HTML
+    servlet:
+      content-type: text/html
+  mvc:
+    static-path-pattern: /**
+  resources:
+    static-locations: classpath:/static/
+  datasource:
+    url: jdbc:mysql://localhost:3306/hiphop?useUnicode=true&characterEncoding=utf8
+    username: root
+    password:
+    driver-class-name: com.mysql.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+  logging:
+    config: classpath:log4j2.xml
+    level:
+      com.olande: DEBUG
+
+  redis:
+    password: 080423mx
+    host: 192.168.120.118
+    port: 6379
+    timeout: 6000
+    jedis:
+      pool:
+        max-active: 20
+        max-idle: 8
+        max-wait: -1
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.olande.hiphop.entity
+swagger:
+  enable: true
+

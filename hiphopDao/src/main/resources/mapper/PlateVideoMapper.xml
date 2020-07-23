@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.olande.hiphop.mapper.PlateVideoMapper">
+    <!-- 根据视频ID查询视频详细信息-->
+    <select id="getVideoMap" parameterType="string" resultType="map">
+<![CDATA[
+        SELECT video_id,
+               tags,
+               video_url,
+               video_name,
+               video_desc,
+               member_user_id,
+               video_face_img,
+               upload_time,
+               check_status,
+               video_status,
+               upload_time,
+               a.dict_code,
+               d.dict_name,
+               m.email,
+               m.username,
+               m.nickname,
+               m.head_img
+        FROM plate_video AS a
+                 LEFT JOIN member_user AS m ON a.member_user_id = m.member_id
+                 LEFT JOIN sys_dict_item AS d ON d.dict_code = a.dict_code
+        WHERE a.video_id = #{video_id}
+        ]]>
+    </select>
+
+</mapper>

@@ -1,0 +1,91 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span> <span class="sr-only">Close</span>
+            </div>
+            <h4 class="modal-title">文章审核</h4>
+        </div>
+        <div class="modal-body" id="modalbody" roller="false"
+             style="width: 90%; position: relative; overflow-x: hidden; overflow-y: auto;margin-left: auto;margin-right: auto;">
+            <div id="alertMessage"></div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-sm-8">
+                        <ul th:switch="${param.check_status[0]}" style="list-style: none">
+                            <li th:case="1">
+                                <input type="radio" class="radio-inline" name="check_status" value="2"/>失败
+                                <input type="radio" class="radio-inline" name="check_status" value="3"/>通过
+                            </li>
+                            <li th:case="2">
+                                <input type="radio" class="radio-inline" name="check_status" value="3"/>通过
+                            </li>
+                            <li th:case="4">
+                                <input type="radio" class="radio-inline" name="check_status" value="5"/>失败
+                                <input type="radio" class="radio-inline" name="check_status" value="6"/>通过
+                            </li>
+                            <li th:case="5">
+                                <input type="radio" class="radio-inline" name="check_status" value="6"/>通过
+                            </li>
+                            <li th:case="3">已通过</li>
+                            <li th:case="6">已通过</li>
+                            <li th:case="*">未知状态</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="btn btn-default" data-dismiss="modal" id="dialogng">关闭</div>
+                <button type="button" class="btn btn-primary" id="submit_button">
+                    <span>确定</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:inline="javascript">
+    $(function () {
+        $('#submit_button').click(function () {
+            var checkStatus = $(':radio:checked').val();
+            if ($.isEmptyObject(checkStatus)) {
+                alert("请选择审核操作状态!");
+            } else {
+                if (window.confirm("确定要进行当前操作吗?")) {
+                    //审核文章}
+                    $.ajax({
+                        type: "GET",
+                        data:{
+                            article_id:[[${param.article_id[0]}]],
+                            check_status:checkStatus
+                        },
+                        url: window.webContextPath+"/article/check",
+                        dataType: "json",
+                        success: function(jsonData, textStatus) {
+                            if(0 != jsonData.status) {
+                                showAlertMsg("审核文章时服务器异常[" + jsonData.message + "]");
+                                window.setTimeout("clearAlertMsg()", 1000);
+                                $("#submit_button").attr("disabled", false);
+                                return;
+                            }
+                            var rows = Number(jsonData.data);
+                            if(1 == rows) {
+                                showAlertMsg("操作成功!");
+                                $("#submit_button").attr("disabled", false);
+                                window.location.reload(true);
+                            } else {
+                                showAlertMsg("操作失败");
+                                window.setTimeout("clearAlertMsg()", 1000);
+                                $("#submit_button").attr("disabled", false);
+                            }
+                        },
+                        error: function(XMLHttpRequest, textStatus, errorThrown) {
+                            showAlertMsg("审核文章时客户端异常[" + errorThrown + "]");
+                            window.setTimeout("clearAlertMsg()", 1000);
+                            $("#submit_button").attr("disabled", false);
+                        }
+                    });
+                }
+            }
+        });
+    });
+</script>

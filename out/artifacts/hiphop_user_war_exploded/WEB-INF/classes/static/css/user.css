@@ -1,0 +1,102 @@
+@charset "utf-8";
+.base {
+	text-align: center;
+	position: relative;
+	width: 100%;
+}
+
+.base>div {
+	margin: 0 auto;
+	width: 95%;
+}
+
+.base .head {
+	margin-top: 10px;
+	height: 50px;
+	line-height: 50px;
+}
+
+.head div {
+	text-align: left;
+}
+
+.span_index {
+	margin-left: 30px;
+}
+
+.span_sys {
+	float: right;
+	padding-right: 20px;
+}
+
+.user_center {
+	font-size: 16px;
+	font-weight: 800;
+	color: #929292;
+}
+
+.user_logo {
+	background: url(../img/user_center.png) no-repeat center left;
+	width: 120px;
+	height: 60px;
+	cursor: pointer;
+	line-height: 60px;
+	text-align: right;
+}
+
+.middle {
+	text-align: left;
+	margin-top: 30px;
+	padding-top: 10px;
+}
+
+.bottom {
+	padding-top: 100px;
+	color: #666666;
+	font-style: oblique;
+	font-size: 16px;
+}
+
+.copy {
+	font-weight: 800;
+	font-size: 20px;
+}
+.user_navi
+{
+	border-bottom:4px solid #C6C6C6;
+	height:30px;
+    padding-left:0px;
+}
+
+
+.user_navi li.tag {
+	font-size: 18px;
+	margin-right: 20px;
+	height: 30px;
+	cursor: pointer;
+}
+
+
+.user_navi li.tag_select {
+	font-size: 18px;
+	margin-right: 20px;
+	height: 30px;
+	border-bottom: 4px solid #3737FF;
+}
+.qian {
+  background-image: url(../img/qian.jpg);
+  width: 120px;
+  height: 120px;
+  border: 0px solid;
+  cursor: pointer;
+  -moz-border-radius: 60px;
+  -webkit-border-radius: 60px;
+  border-radius: 60px;
+}
+
+.user_navi li.tag:hover {
+	border-bottom: 4px solid #3737FF;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+}

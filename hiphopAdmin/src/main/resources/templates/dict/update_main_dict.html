@@ -1,0 +1,261 @@
+<div class="modal-dialog">
+	<div class="modal-content">
+		<div class="modal-header">
+			<div class="close" data-dismiss="modal">
+				<span aria-hidden="true">&times;</span> <span class="sr-only">Close</span>
+			</div>
+			<h4 class="modal-title">修改主菜单</h4>
+		</div>
+		<div class="modal-body" id="modalbody" roller="false"
+			style="width: 90%; position: relative; overflow-x: hidden; overflow-y: auto;margin-left: auto;margin-right: auto;">
+			<form
+				action="${pageContext.request.contextPath}/manager/update_main_menu"
+				method="post">
+				<input type="hidden" name="main_menu_id" value="${param.main_menu_id}"/>
+				<div id="alertMessage"></div>
+				<div class="form-group">
+					<div class="row">
+						<label class="control-label col-md-2" style="text-align: right;">菜单名称</label>
+						<div class="col-sm-3">
+							<input type="text" id="menu_name" class="form-control" name="menu_name" />
+						</div>
+						<div class="col-sm-1">
+							<span style="color:rgb(255,0,0)">*</span>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="row">
+						<label class="control-label col-md-2" style="text-align: right;">菜单URL</label>
+						<div class="col-sm-3">
+							<input type="url" id="menu_url" class="form-control"
+								name="menu_url" />
+						</div>
+						<div class="col-sm-1"></div>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="row">
+						<label class="control-label col-md-2" style="text-align: right;">菜单LOGO</label>
+						<div class="col-sm-3">
+							<input type="hidden" name="menu_logo" id="menu_logo" /> <input
+								type="file" id="file" allowexts="gif,jpeg,jpg,png,bmp"
+								accept="image/*" onchange="readFile(this)"> <img
+								id="menu_logo_img" class="am-img-thumbnail" alt="菜单LOGO">
+							<div class="txtPic">上传LOGO</div>
+						</div>
+						<div class="col-sm-1">
+						   <button type="button" class="btn btn-link" onclick="clearLOGO()">清除LOGO</button>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="row">
+						<label class="control-label col-md-2" style="text-align: right;">是否包含子菜单</label>
+						<div class="col-sm-3">
+							<label class="checkbox-inline"> <input type="radio"
+								name="contain_sub" id="contain_sub" value="1">包含
+							</label> <label class="checkbox-inline"> <input type="radio"
+								name="contain_sub" id="contain_sub" value="0"> 不包含
+							</label>
+						</div>
+						<div class="col-sm-1">
+							<span style="color:rgb(255,0,0)">*</span>
+						</div>
+					</div>
+				</div>
+			</form>
+			<div class="modal-footer">
+				<div class="btn btn-default" data-dismiss="modal" id="dialogng">关闭</div>
+				<button type="button" class="btn btn-primary" id="submit_button">
+					<span>修改主菜单</span>
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	function readFile(obj) {
+		var file = obj.files[0];
+		//判断类型是不是图片
+		if (!/image\/\w+/.test(file.type)) {
+			alert("请确保文件为图像类型");
+			return false;
+		}
+		var reader = new FileReader();
+		reader.readAsDataURL(file);
+		reader.onload = function(e) {
+			var base64 = this.result; //就是base64
+			$("#menu_logo").val(base64);
+			$("#menu_logo_img").attr('src', base64);
+		}
+	}
+	$(function() {
+		$(".txtPic").click(function() {
+			$("#file").click();
+		});
+
+		$("#submit_button").click(function() {
+			updateMainMenu();
+		});
+		loadMainMenu('${param.main_menu_id}');
+	});
+	/**
+	 *修改主菜单
+	 */
+	function updateMainMenu() {
+		$("#submit_button").attr("disabled", true);
+		filterFormInput();
+		var menu_name = $("#menu_name").val();
+		if ("" == menu_name) {
+			showAlertMsg("请输入菜单名称");
+			window.setTimeout("clearAlertMsg()", 1000);
+			$("#submit_button").attr("disabled", false);
+			return;
+		}
+		if(!isUpdated())
+		{
+			showAlertMsg("主菜单信息未修改!");
+			window.setTimeout("clearAlertMsg()", 1000);
+			$("#submit_button").attr("disabled", false);
+			return;
+		}
+		if(menu_name==window.mainMenu.menu_name)
+	    {
+			if (window.confirm("确定要修改该主菜单信息吗?")) {
+				$("form:first").submit();
+			} else {
+				$("#submit_button").attr("disabled", false);
+			}
+	    }else
+	    {
+	    	checkMainMenuName(menu_name);
+	    }
+		
+	}
+	
+	function checkMainMenuName(menu_name)
+	{
+		//检查主菜单名称是已否被使用
+		$
+				.ajax({
+					type : "post",
+					url : window.contextPath + "/manager/check_main_menu",
+					data : {
+						menu_name : menu_name
+					},
+					dataType : "json",
+					success : function(jsonData, textStatus) {
+						if (0 != jsonData.status) {
+							showAlertMsg("检查主菜单名称是否被使用,服务器异常["
+									+ jsonData.message + "]");
+							window.setTimeout("clearAlertMsg()", 1000);
+							$("#submit_button").attr("disabled", false);
+							return;
+						}
+						var rows = Number(jsonData.data.rows);
+						if (1 == rows) {
+							showAlertMsg("主菜单名称已被使用");
+							window.setTimeout("clearAlertMsg()", 1000);
+							$("#submit_button").attr("disabled", false);
+						} else if (0 == rows) {
+							if (window.confirm("确定要修改该主菜单信息吗?")) {
+								$("form:first").submit();
+							} else {
+								$("#submit_button").attr("disabled", false);
+							}
+
+						} else {
+							showAlertMsg("检查主菜单名称是否被使用,服务器返回错误状态");
+							window.setTimeout("clearAlertMsg()", 1000);
+							$("#submit_button").attr("disabled", false);
+						}
+
+					},
+					error : function(XMLHttpRequest, textStatus, errorThrown) {
+						showAlertMsg("检查主菜单名称是否被使用,客户端异常[" + errorThrown + "]");
+						window.setTimeout("clearAlertMsg()", 1000);
+					}
+				});		
+		
+		
+	}
+	/**
+	 *加载主菜单信息
+	 */
+	function loadMainMenu(main_menu_id) {
+		$.ajax({
+			type : "post",
+			url : window.contextPath + "/manager/get_main_menu",
+			data : {
+				main_menu_id : main_menu_id
+			},
+			dataType : "json",
+			success : function(jsonData, textStatus) {
+				if (0 != jsonData.status) {
+					showAlertMsg("加载主菜单信息失败,服务器异常[" + jsonData.message + "]");
+					window.setTimeout("clearAlertMsg()", 1000);
+					disabledUpdateForm();
+					return;
+				}
+				var mainMenu=jsonData.data;
+				if($.isEmptyObject(mainMenu))
+				{
+					showAlertMsg("该主菜单信息不存在或已删除!");
+					window.setTimeout("clearAlertMsg()", 1000);
+					disabledUpdateForm();
+					return;
+				}
+				$("#menu_name").val(mainMenu.menu_name);
+				$("#menu_url").val(mainMenu.menu_url);
+				var menu_logo=mainMenu.menu_logo;
+				$("#menu_logo").val(menu_logo);
+				if(""!=menu_logo)
+				{
+					$("#menu_logo_img").attr('src', menu_logo);
+				}
+				$(":radio[value='"+mainMenu.contain_sub+"']").attr("checked",true);
+				window.mainMenu=mainMenu;
+			},
+			error : function(XMLHttpRequest, textStatus, errorThrown) {
+				showAlertMsg("加载主菜单信息失败,客户端异常[" + errorThrown + "]");
+				window.setTimeout("clearAlertMsg()", 1000);
+				disabledUpdateForm();
+			}
+		});
+	}
+	
+	function disabledUpdateForm()
+	{
+		$("#submit_button").attr("disabled", true);
+		disabledForm();
+	}
+	/**
+	 *判断是否被修改
+	 */
+	function isUpdated()
+	{
+		if($("#menu_name").val()!=window.mainMenu.menu_name)
+	    {
+			return true;
+	    }
+		if($("#menu_url").val()!=window.mainMenu.menu_url)
+	    {
+			return true;
+	    }	
+		if($("#menu_logo").val()!=window.mainMenu.menu_logo)
+	    {
+			return true;
+	    }	
+		if($(":radio[checked='checked']").val()!=window.mainMenu.contain_sub)
+	    {
+			return true;
+	    }	
+		return false;
+	}
+	function clearLOGO()
+	{
+		$("#menu_logo_img").removeAttr('src');
+		$("#menu_logo").val("");
+	}
+</script>

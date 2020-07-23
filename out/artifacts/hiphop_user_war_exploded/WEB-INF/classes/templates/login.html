@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<script th:if="${session.member_user!=null}">
+    //检查是否登录
+    window.location.href = '/page/user/user_info';
+</script>
+<html>
+
+<head>
+    <meta charset="UTF-8"/>
+    <title>用户登录</title>
+    <link type="text/css" href="/css/yunku.css" rel="stylesheet"/>
+    <style type="text/css">
+        .input1 {
+            width: 240px;
+            height: 30px;
+        }
+
+        .input2 {
+            width: 100px;
+            vertical-align: middle;
+            height: 30px;
+            margin-right: 20px;
+        }
+
+        .but1 {
+            width: 120px;
+            height: 36px;
+            vertical-align: middle;
+            cursor: pointer;
+        }
+
+        .but2 {
+            width: 244px;
+            height: 36px;
+            vertical-align: middle;
+            text-align: center;
+            font-size: 20px;
+            color: #FFFFFF;
+            background-color: #25A3F3;
+            border: 1px solid #0C8ADE;
+            cursor: pointer;
+        }
+        body{
+            background-color: RGB(247,243,231);
+        }
+    </style>
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+</head>
+
+<body>
+<div>
+
+    <div style="margin-top: 60px;"></div>
+    <div style="text-align: center;">
+        <div style="width: 400px; margin: 0 auto;">
+            <form action="/member/login" method="post">
+                <ul style="list-style: none; padding-left: 0px;">
+                    <li class="li3"></li>
+                    <li class="li2"><span>登录Hiphop网</span>&nbsp;&nbsp;&nbsp;&nbsp;<a
+                            href="/">返回首页</a></li>
+                    <li class="li3"></li>
+                    <li class="li2"><input type="text" id="email" name="email"
+                                           class="input1" placeholder="电子邮件"/></li>
+                    <li class="li3"><span id="e_message"
+                                          style="color: #FF0000; font-size: 12px;"></span></li>
+                    <li class="li2"><input type="password" class="input1"
+                                           placeholder="密码为6-18个非空白字符" name="password" id="password"/>
+                    </li>
+                    <li class="li3">   <span id="pwd_message"
+                                             style="color: #FF0000; font-size: 12px;"></span></li>
+                    <li class="li2"><input type="button" class="but2" value="登录"
+                                           onclick="checkFormDatas()"/></li>
+                    <li class="li3"><span style="color: #ADADAD;">没有帐号</span><a
+                            href="/page/register">免费注册</a>
+
+                </ul>
+            </form>
+        </div>
+    </div>
+    <div style="text-align: center; margin-top: 200px;">
+        <span style="color: #666666; font-style: oblique; font-size: 18px; margin: 0 auto;">Copyright&copy;2020 hiphop</span>
+    </div>
+</div>
+<script type="text/javascript">
+</script>
+<script type="text/javascript">
+    /*
+     * 清除错误提示
+     */
+    function clearMessage(id){
+       window.setTimeout('$("'+id+'").text("")',500);
+    }
+    //检查登录表单数据
+    function checkFormDatas() {
+        //检查email
+        var email = $('#email').val();
+        if ("" == email) {
+            $('#e_message').text('请输入电子邮件/用户名');
+            clearMessage('#e_message');
+            return;
+        }
+        //验证email正则表达式
+        var regex = /^(?:\w+\.?)*\w+@(?:\w+\.)*\w+$/;
+        if (!regex.test(email)) {
+            $('#e_message').text('电子邮件格式错误');
+            clearMessage('#e_message');
+            return;
+        }
+        //检查密码
+        var password = $("#password").val();
+        if ("" == password) {
+            $("#pwd_message").text("请输入密码");
+            clearMessage('#pwd_message');
+            return;
+        }
+        var regex = /^[^\s]{6,18}$/;
+        if (!regex.test(password)) {
+            $("#pwd_message").text("密码为6-18个非空白字符");
+            clearMessage('#pwd_message');
+            return;
+        }
+        $.ajax({
+            url: '/member/login',
+            type: 'POST',
+            data: {email: email, password: password},
+            dataType: 'json',
+            success: function (result) {
+                var status = result.status;
+                if (0 != status) {
+                    alert('登录失败【' + result.message + '】');
+                } else {
+                    window.location.href='/page/user/user_info'
+                }
+            },
+            error: function (e) {
+                alert('客户端异常');
+            }
+        });
+    }
+</script>
+</body>
+</html>

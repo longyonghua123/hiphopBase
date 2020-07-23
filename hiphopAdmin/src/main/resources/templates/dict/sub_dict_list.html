@@ -1,0 +1,115 @@
+<!DOCTYPE html >
+<html th:replace="common/base (title='子字典项维护')">
+
+    <!-- layout文件路径-->
+    <div th:fragment="content">
+    <style type="text/css">
+        #subDictDialog .modal-dialog {
+            width: 900px;
+        }
+
+        .record_td {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            word-break: keep-all;
+        }
+    </style>
+    <style type="text/css">
+        .am-img-thumbnail {
+            display: inline-block;
+            width: 122px;
+            height: 122px;
+            padding: 2px;
+            line-height: 1.6;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 0;
+            -webkit-transition: all 0.2s ease-in-out;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .txtPic {
+            background: rgb(25, 118, 175);
+            color: #fff;
+            height: 25px;
+            width: 122px;
+            text-align: center;
+            line-height: 25px;
+            cursor: pointer;
+        }
+
+        input[type='file'] {
+            display: none;
+        }
+    </style>
+    <script type="text/javascript" th:src="${#httpServletRequest.getContextPath()+'/res/js/manager/sub_dict_list.js'}"></script>
+    <script type="text/javascript" th:inline="javascript">
+        var pDictCode=[[${param.p_dict_code==null?'':param.p_dict_code[0]}]];
+    </script>
+    <ol class="breadcrumb">
+        <li>当前位置:子字典项维护</li>
+    </ol>
+    <div class="container-fluid" style="padding-left: 0px;">
+        <div class="well">
+            <div class="form-group" style="line-height: 32px;width: 100%">
+                <div class="row">
+                    <div class="col-sm-2" style="width: 120px">
+                        <button onclick="showAddSubDictDialog()" id="new-btn" data-loading-text="Loading..."
+                                class="btn btn-default">新增子字典项
+                        </button>
+                    </div>
+                    <div class="col-sm-2">
+                        <label style="text-align: center;">所属主字典项</label>
+                    </div>
+                    <div class="col-sm-2">
+                        <select id="main_dict_select" class="form-control">
+                            <option value="">---选择主字典项---</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="scrollContent" style="width: 99%">
+        <table align="center" class="table table-hover table-striped" id="dataTables-example"
+               style="table-layout:fixed;" expandable="true" width="100%">
+            <thead>
+                <tr style="text-align:center">
+                    <th width="15%" style="text-align:center">
+                        <span>字典项名称</span>
+                    </th>
+                    <th width="15%" style="text-align:center">
+                        <span>字典项代码</span>
+                    </th>
+                    <th width="10%" style="text-align:center">
+                        <span>使用状态</span>
+                    </th>
+                    <th width="15%" style="text-align:center">
+                        <span>操作</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="display: none" id="rowTemp">
+                    <td class="record_td" nowrap="nowrap">
+                        <span>dictName</span>
+                    </td>
+                    <td class="record_td" nowrap="nowrap">
+                        <span>dictCode</span>
+                    </td>
+                    <td class="record_td" nowrap="nowrap" style="text-align:center">useStatus</td>
+                    <td class="record_td" nowrap="nowrap">
+                        <button type="button" class="btn btn-link" onclick="showUpdateSubDictDialog('dictId')">修改</button>
+                        <button type="button" class="btn btn-link" onclick="disableSubDict('dictId')">停用</button>
+                        <button type="button" class="btn btn-link" onclick="enableSubDict('dictId')">复用</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="modal fade" id="subDictDialog" tabindex="-1" role="dialog" aria-labelledby="versionEditLabel"
+         aria-hidden="true"></div>
+    </div>
+</html>

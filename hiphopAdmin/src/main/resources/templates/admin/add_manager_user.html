@@ -1,0 +1,108 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span> <span class="sr-only">Close</span>
+            </div>
+            <h4 class="modal-title">添加系统用户</h4>
+        </div>
+        <div class="modal-body" id="modalbody" roller="false" style="width: 90%; position: relative; overflow-x: hidden; overflow-y: auto;margin-left: auto;margin-right: auto;">
+            <form  th:action="${#httpServletRequest.getContextPath()+'/admin/add_user'}" method="post" >
+                <div id="alertMessage"></div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="control-label col-md-2" style="text-align: right;">管理员姓名</label>
+                        <div class="col-sm-3">
+                            <input type="text" id="name" class="form-control" name="username" />
+                        </div>
+                        <div class="col-sm-1">
+                            <span style="color:rgb(255,0,0)">*</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="control-label col-md-2" style="text-align: right;">角色</label>
+                        <div class="col-sm-3">
+                           <select  name="user_role"   class="form-control">
+                            <option value="">----请选择角色---</option>
+                            <option value="1">超级管理员</option>
+                            <option value="0">普通管理员</option>
+                           </select>
+                        </div>
+                        <div class="col-sm-1">
+                         <span style="color:rgb(255,0,0)">*</span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <div class="btn btn-default" data-dismiss="modal" id="dialogng">关闭</div>
+                <button type="button" class="btn btn-primary" id="submit_button"  onclick="addManagerUser()">
+                  <span>添加系统用户</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+ 
+    /**
+     *添加子菜单
+     */
+    function addManagerUser() {
+        $("#submit_button").attr("disabled", true);
+        filterFormInput();
+        var name = $("#name").val();
+        if("" == name) {
+            showAlertMsg("请输入管理员名字!");
+            window.setTimeout("clearAlertMsg()", 1000);
+            $("#submit_button").attr("disabled", false);
+            return;
+        }
+        var role = $("form select").val();
+        if("" == role) {
+            showAlertMsg("请选择管理用户角色!");
+            window.setTimeout("clearAlertMsg()", 1000);
+            $("#submit_button").attr("disabled", false);
+            return;
+        }
+        //检查管理员是否被使用
+        $.ajax({
+            type: "post",
+            url: "/admin/check_username",
+            data: {username: name},
+            dataType: "json",
+            success: function(jsonData, textStatus) {
+                if(0 != jsonData.status) {
+                    showAlertMsg("检查系统用户名是否被使用,服务器异常[" + jsonData.message + "]");
+                    window.setTimeout("clearAlertMsg()", 1000);
+                    $("#submit_button").attr("disabled", false);
+                    return;
+                }
+                var rows = Number(jsonData.data);
+                if(1 == rows) {
+                    showAlertMsg("系统用户已被使用");
+                    window.setTimeout("clearAlertMsg()", 1000);
+                    $("#submit_button").attr("disabled", false);
+                } else if(0 == rows) {
+                    if(window.confirm("确定要添加系统用户吗?")) {
+                        $("form:first").submit();
+                    } else {
+                        $("#submit_button").attr("disabled", false);
+                    }
+
+                } else {
+                    showAlertMsg("检查系统用户名是否被使用,服务器返回错误状态");
+                    window.setTimeout("clearAlertMsg()", 1000);
+                    $("#submit_button").attr("disabled", false);
+                }
+
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                showAlertMsg("检查系统用户名是否被使用,客户端异常[" + errorThrown + "]");
+                window.setTimeout("clearAlertMsg()", 1000);
+            }
+        }); 
+    }
+</script>

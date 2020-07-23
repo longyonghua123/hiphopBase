@@ -1,0 +1,166 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span> <span class="sr-only">Close</span>
+            </div>
+            <h4 class="modal-title">添加演出</h4>
+        </div>
+        <div class="modal-body" id="modalbody" roller="false"
+             style="width: 90%; position: relative; overflow-x: hidden; overflow-y: auto;margin-left: auto;margin-right: auto;">
+            <form th:action="${#httpServletRequest.getContextPath()+'/perform/add_perform'}" method="post"
+                  id="add_perform_form">
+                <div id="alertMessage"></div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="control-label col-md-2" style="text-align: right;">演出标题</label>
+                        <div class="col-sm-4">
+                            <input type="text" id="perform_title" class="form-control" name="performTitle"/>
+                        </div>
+                        <div class="col-sm-1">
+                            <span style="color:rgb(255,0,0)">*</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="control-label col-md-2" style="text-align: right;">演出内容</label>
+                        <div class="col-sm-3">
+                            <textarea type="text" id="perform_context" class="form-control" name="performContext">
+                            </textarea>
+                        </div>
+                        <div class="col-sm-1">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="control-label col-md-2" style="text-align: right;">开始时间</label>
+                        <div class='input-group date col-md-6' id='start_time_datetimepicker'
+                             style="padding-left: 15px!important;">
+                            <input type='text' id="start_time" class="form-control" name="startTime"
+                                   readonly="readonly"/>
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                        <div class="col-sm-1">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="control-label col-md-2" style="text-align: right;">结束时间</label>
+                        <div class='input-group date col-md-6' id='end_time_datetimepicker'
+                             style="padding-left: 15px!important;">
+                            <input type='text' id="end_time" class="form-control" name="endTime" readonly="readonly"/>
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                        <div class="col-sm-1">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="control-label col-md-2" style="text-align: right;">分类</label>
+                        <div class="col-sm-3">
+                            <select name="dictCode" class="form-control">
+                            </select>
+                        </div>
+                        <div class="col-sm-1">
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <div class="btn btn-default" data-dismiss="modal" id="dialogng">关闭</div>
+                <button type="button" class="btn btn-primary" id="submit_button">
+                    <span>添加演出</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $('#start_time_datetimepicker').datetimepicker({
+            language: 'zh-CN',
+            format: 'YYYY-MM-DD hh:mm:ss'
+        });
+        $('#end_time_datetimepicker').datetimepicker({
+            language: 'zh-CN',
+            format: 'YYYY-MM-DD hh:mm:ss',
+        });
+    });
+
+
+
+    $(function () {
+        loadPerformSubDict();
+        $("#submit_button").click(function () {
+            addPerform();
+        });
+    });
+
+    /**
+     *添加演出
+     */
+    function addPerform() {
+        $("#submit_button").attr("disabled", true);
+        filterFormInput();
+        var performTitle = $("#perform_title").val();
+        if ("" == performTitle) {
+            showAlertMsg("请输入演出标题");
+            window.setTimeout("clearAlertMsg()", 1000);
+            $("#submit_button").attr("disabled", false);
+            return;
+        }
+        var performContext = $("#perform_context").val();
+        if ("" == performContext) {
+            showAlertMsg("请输入演出内容");
+            window.setTimeout("clearAlertMsg()", 1000);
+            $("#submit_button").attr("disabled", false);
+            return;
+        }
+        if (window.confirm("确定要添加演出信息吗?")) {
+            $('#add_perform_form').submit();
+        } else {
+            $("#submit_button").attr("disabled", false);
+        }
+    }
+
+    /**
+     * 加载演出子字典项
+     * @param pDictCode
+     */
+    function loadPerformSubDict() {
+        $.ajax({
+            type: "GET",
+            url: window.webContextPath + "/dict/load_sub_dict",
+            data: {
+                p_dict_code: '200000'
+            },
+            dataType: "json",
+            success: function (jsonData, textStatus) {
+                if (0 != jsonData.status) {
+                    alert("加载子字典项失败[" + jsonData.message + "]");
+                    return;
+                }
+                var subDicts = jsonData.data;
+                $('form select').append('<option disabled="disabled">--选择分类--</option>');
+                $.each(subDicts, function () {
+                   var dictName= this.dictName;
+                   var dictCode=this.dictCode;
+                   var optionHTML='<option value="'+dictCode+'">'+dictName+'</option>';
+                   $('form select').append(optionHTML);
+                });
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert("加载子字典项失败!");
+            }
+        });
+
+    }
+</script>

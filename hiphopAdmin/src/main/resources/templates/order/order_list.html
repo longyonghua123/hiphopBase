@@ -1,0 +1,256 @@
+<!DOCTYPE html >
+<html lang="en" th:replace="common/base (title='文章列表')">
+<!-- layout文件路径-->
+<div th:fragment="content">
+    <ol class="breadcrumb">
+        <li>当前位置:文章查询</li>
+    </ol>
+    <div class="container-fluid" style="padding-left: 0px;">
+        <div class="well">
+            <div class="form-group" style="line-height: 32px;width: 100%">
+                <div class="row">
+                    <div style="float: left;padding-left: 20px"><span class="control-label">文章状态</span></div>
+                    <div style="width:300px!important;padding-left:100px">
+                        <select id="article_status_select" class="form-control">
+                            <option disabled="disabled">---请选择---</option>
+                            <option value="0">全部</option>
+                            <option value="1">发布中</option>
+                            <option value="2">已下架</option>
+                            <option value="3">审核中</option>
+                            <option value="4">审核失败</option>
+                            <option value="5">已注销</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="scrollContent" style="width: 99%">
+        <form id="query_article_form" name="form" method="post" action="/article/query_page">
+            <table align="center" class="table table-hover table-striped" id="dataTables-example"
+                   style="table-layout:fixed;" expandable="true" width="100%">
+                <thead>
+                <tr>
+                    <th width="5%">
+                        <span>序号</span>
+                    </th>
+                    <th width="10%">
+                        <span>文章标题</span>
+                    </th>
+                    <th width="15%">
+                        <span>文章类型</span>
+                    </th>
+                    <th width="10%">
+                        <span>文章状态</span>
+                    </th>
+                    <th width="10%">
+                        <span>审核状态</span>
+                    </th>
+                    <th width="10%">
+                        <span>发布者</span>
+                    </th>
+                    <th width="10%">
+                        <span>发布时间</span>
+                    </th>
+                    <th width="20%">
+                        <span>操作</span>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(page.records)}">
+                    <td colspan="8" style="text-align: center;color: #FF0000">没有查询到任何文章数据</td>
+                </tr>
+                <tr th:if="${not #lists.isEmpty(page.records)}" th:each="article:${page.records}">
+                    <td th:text="${articleStat.index+1}"></td>
+                    <td th:text="${article.articleTitle}"></td>
+                    <td th:text="${article.dictItem.dictName}"></td>
+                    <td th:switch="${article.articleStatus}">
+                        <span th:case="1">使用中</span>
+                        <span th:case="2">已下架</span>
+                        <span th:case="3">审核中</span>
+                        <span th:case="4">已失败</span>
+                        <span th:case="5">已屏蔽</span>
+                        <span th:case="*">未知</span>
+                    </td>
+                    <td th:switch="${article.checkStatus}">
+                        <span th:case="1">未审核(新增)</span>
+                        <span th:case="2">审核失败(新增)</span>
+                        <span th:case="3">审核通过(新增)</span>
+                        <span th:case="4">未审核(修改)</span>
+                        <span th:case="5">审核失败(修改)</span>
+                        <span th:case="6">审核通过(修改)</span>
+                        <span th:case="6">未知</span>
+                    </td>
+                    <td th:text="${article.member==null?'未知':article.member.email}"></td>
+                    <td th:text="${article.pubTime!=null?#dates.format(article.pubTime, 'yyyy-MM-dd HH:mm:ss'):'未知'}"></td>
+                    <td>
+                        <button type='button' class='btn btn-link'
+                                th:onclick="'showArticleInfo(\''+${article.articleId}+'\')'">
+                            查看
+                        </button>
+                        <button th:if="${5!=article.articleStatus and (1==article.checkStatus||2==article.checkStatus||4==article.checkStatus ||5==article.checkStatus)}" type='button' class='btn btn-link' th:onclick="'showCheckArticleModal(\''+${article.checkStatus}+'\',\''+${article.articleId}+'\')'" >
+                            审核
+                        </button>
+                        <button th:if="${3==article.checkStatus||6==article.checkStatus||5==article.articleStatus}" type='button' class='btn btn-link' disabled="disabled">
+                            审核
+                        </button>
+                        <button th:if="${5!=article.articleStatus}" type='button' class='btn btn-link' th:onclick="'setArticleStatus('+${article.checkStatus}+',5,\''+${article.articleId}+'\')'">
+                            屏蔽
+                        </button>
+                        <button th:if="${5==article.articleStatus}" type='button' class='btn btn-link' th:onclick="'setArticleStatus('+${article.checkStatus}+',1,\''+${article.articleId}+'\')'">
+                            恢复
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div></div>
+            <div th:replace="common/page::pageContext"></div>
+            <!-- 使用状态-->
+            <input type="hidden" id="article_status" name="article_status"/>
+        </form>
+    </div>
+    <div class="modal fade" id="articleInfoDialog" tabindex="-1" role="dialog" aria-labelledby="versionEditLabel"
+         aria-hidden="true"></div>
+
+    <script type="text/javascript" th:inline="javascript">
+        //初始化用户状态
+        var userStatus = [[${page.criteriaMap==null?-1:page.criteriaMap['article_status']}]];
+        userStatus = userStatus == null ? "-1" : userStatus;
+        $("#article_status_select").find('option[value="' + userStatus + '"]').attr("selected", true);
+        $("#article_status").val(userStatus);
+        $(function () {
+            $("#article_status_select").change(function () {
+                var userStatus = $("#article_status_select").val()
+                $("#article_status").val(userStatus);
+                $("#pageNum").val(1);//改变选项后,设置当前页号为1
+                $("#query_article_form").submit();
+            });
+        });
+
+        /**
+         *注销会员用户
+         */
+        function disableMainMember(articleId) {
+            if (window.confirm('确定注销该会员用户吗?')) {
+                var current = $("#pageNum").val();
+                var url = window.webContextPath + "/article/set_article_status?article_status=0&amp;current=" + current + "&amp;article_id=" + articleId + "&amp;rd=" + Math.random();
+                url = replaceSpecialChars(url);
+                window.location.href = url;
+            }
+        }
+
+        /**
+         *复用会员用户
+         */
+        function enableMainMember(articleId) {
+            if (window.confirm('确定复用该会员用户吗?')) {
+                var current = $("#pageNum").val();
+                var url = window.webContextPath + "/article/set_article_status?article_status=1&amp;current=" + current + "&amp;article_id=" + articleId + "&amp;rd=" + Math.random();
+                url = replaceSpecialChars(url);
+                window.location.href = url;
+            }
+        }
+
+        /**
+         * 查看文章详细信息
+         * @param articleId
+         */
+        function showArticleInfo(articleId) {
+            $.ajax({
+                type: "GET",
+                url: window.webContextPath + "/article/article_details?article_id=" + articleId,
+                dataType: "html",
+                success: function (data, textStatus) {
+                    $("#articleInfoDialog").html(data);
+                    $("#articleInfoDialog").modal();
+                },
+                error: function () {
+                }
+            });
+        }
+
+        /**
+         * 打开审核文章模态框
+         * @param checkStatus
+         * @param articleId
+         */
+        function showCheckArticleModal(checkStatus, articleId) {
+            $.ajax({
+                type: "GET",
+                data: {
+                    check_status: checkStatus,
+                    article_id: articleId
+                },
+                url: window.webContextPath + "/page/article/check",
+                dataType: "html",
+                success: function (data, textStatus) {
+                    $("#articleInfoDialog").html(data);
+                    $("#articleInfoDialog").modal();
+                },
+                error: function () {
+                }
+            });
+        }
+
+        /**
+         * 设置文章状态
+         * @param checkStatus  当前审核状态
+         * @param articleStatus
+         * @param articleId
+         */
+        function setArticleStatus(checkStatus, articleStatus, articleId) {
+            if (1 == articleStatus) {
+                //恢复使用
+                if (1 == checkStatus || 2 == checkStatus || 3 == checkStatus) {
+                    checkStatus = 3;
+                } else if (4 == checkStatus || 5 == checkStatus || 6 == checkStatus) {
+                    checkStatus = 6;
+                } else {
+                    alert("文章审核状态错误!")
+                    return;
+                }
+            } else if (5 == articleStatus) {
+                //恢复使用
+                if (1 == checkStatus || 2 == checkStatus || 3 == checkStatus) {
+                    checkStatus = 2;
+                } else if (4== checkStatus || 5 == checkStatus || 6 == checkStatus) {
+                    checkStatus = 4;
+                } else {
+                    alert("文章审核状态错误!")
+                    return;
+                }
+            }else{
+                alert("管理员只能将文章设置为1(使用中)或5(已屏蔽)状态");
+                return;
+            }
+            var checkStatus;//当前审核状态
+            $.ajax({
+                type: "GET",
+                data: {
+                    article_status: articleStatus,
+                    article_id: articleId,
+                    check_status: checkStatus
+                },
+                url: window.webContextPath + "/article/set_status",
+                dataType: "json",
+                success: function (data, textStatus) {
+                    var rows = Number(data.data);
+                    if(1 == rows) {
+                        showAlertMsg("设置成功!");
+                        window.location.reload(true);
+                    } else {
+                        showAlertMsg("设置失败");
+                        $("#submit_button").attr("disabled", false);
+                    }
+
+                },
+                error: function () {
+                    alert('设置文章状态客户端异常');
+                }
+            });
+        }
+    </script>
+</div>
+</html>

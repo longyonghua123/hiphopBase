@@ -1,0 +1,224 @@
+<!DOCTYPE html >
+<html lang="en" th:replace="common/base (title='视频列表')">
+<!-- layout文件路径-->
+<div th:fragment="content">
+    <ol class="breadcrumb">
+        <li>当前位置:视频查询</li>
+    </ol>
+    <div class="container-fluid" style="padding-left: 0px;">
+        <div class="well">
+            <div class="form-group" style="line-height: 32px;width: 100%">
+                <div class="row">
+                    <div style="float: left;padding-left: 20px"><span class="control-label">视频状态</span></div>
+                    <div style="width:300px!important;padding-left:100px">
+                        <select id="video_status_select" class="form-control">
+                            <option disabled="disabled">---请选择---</option>
+                            <option value="0">全部</option>
+                            <option value="1">发布中</option>
+                            <option value="2">已下架</option>
+                            <option value="3">审核中</option>
+                            <option value="4">审核失败</option>
+                            <option value="5">已注销</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="scrollContent" style="width: 99%">
+        <form id="query_video_form" name="form" method="post" action="/video/query_page">
+            <table align="center" class="table table-hover table-striped" id="dataTables-example"
+                   style="table-layout:fixed;" expandable="true" width="100%">
+                <thead>
+                <tr>
+                    <th width="5%">
+                        <span>序号</span>
+                    </th>
+                    <th width="10%">
+                        <span>视频标题</span>
+                    </th>
+                    <th width="15%">
+                        <span>视频类型</span>
+                    </th>
+                    <th width="10%">
+                        <span>视频状态</span>
+                    </th>
+                    <th width="10%">
+                        <span>审核状态</span>
+                    </th>
+                    <th width="10%">
+                        <span>发布者</span>
+                    </th>
+                    <th width="10%">
+                        <span>发布时间</span>
+                    </th>
+                    <th width="20%">
+                        <span>操作</span>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(page.records)}">
+                    <td colspan="8" style="text-align: center;color: #FF0000">没有查询到任何视频数据</td>
+                </tr>
+                <tr th:if="${not #lists.isEmpty(page.records)}" th:each="video:${page.records}">
+                    <td th:text="${videoStat.index+1}"></td>
+                    <td th:text="${video.videoName}"></td>
+                    <td th:text="${video.dictItem==null?'未知':video.dictItem.dictName}"></td>
+                    <td th:switch="${video.videoStatus}">
+                        <span th:case="1">使用中</span>
+                        <span th:case="2">已下架</span>
+                        <span th:case="3">审核中</span>
+                        <span th:case="4">已失败</span>
+                        <span th:case="5">已屏蔽</span>
+                        <span th:case="*">未知</span>
+                    </td>
+                    <td th:switch="${video.checkStatus}">
+                        <span th:case="1">未审核(新增)</span>
+                        <span th:case="2">审核失败(新增)</span>
+                        <span th:case="3">审核通过(新增)</span>
+                        <span th:case="4">未审核(修改)</span>
+                        <span th:case="5">审核失败(修改)</span>
+                        <span th:case="6">审核通过(修改)</span>
+                        <span th:case="6">未知</span>
+                    </td>
+                    <td th:text="${video.member==null?'未知':video.member.email}"></td>
+                    <td th:text="${video.uploadTime!=null?#dates.format(video.uploadTime, 'yyyy-MM-dd HH:mm:ss'):'未知'}"></td>
+                    <td>
+                        <button class='btn btn-link' type='button' th:data-video-id="${video.videoId}" onclick="showVideoInfo(this)">查看</button>
+                        <button th:if="${5!=video.videoStatus and (1==video.checkStatus||2==video.checkStatus||4==video.checkStatus ||5==video.checkStatus)}" type='button'  class='btn btn-link' th:data-video-id="${video.videoId}"  th:data-check-status="${video.checkStatus}"  onclick="showCheckVideoModal(this)">审核</button>
+                        <button th:if="${3==video.checkStatus||6==video.checkStatus||5==video.videoStatus}" type='button'  class='btn btn-link' disabled="disabled">审核</button>
+                        <button th:if="${5!=video.videoStatus}" type='button' class='btn btn-link' th:data-video-id="${video.videoId}"  th:data-check-status="${video.checkStatus}" onclick="setVideoStatus(this,5)">屏蔽</button>
+                        <button th:if="${5==video.videoStatus}" type='button' class='btn btn-link' th:data-video-id="${video.videoId}"  th:data-check-status="${video.checkStatus}" onclick="setVideoStatus(this,1)">恢复</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div></div>
+            <div th:replace="common/page::pageContext"></div>
+            <!-- 使用状态-->
+            <input type="hidden" id="video_status" name="video_status"/>
+        </form>
+    </div>
+    <div class="modal fade" id="videoInfoDialog" tabindex="-1" role="dialog" aria-labelledby="versionEditLabel"
+         aria-hidden="true"></div>
+
+    <script type="text/javascript" th:inline="javascript">
+        //初始化视频查询初始状态
+        var videoStatus = [[${page.criteriaMap==null?-1:page.criteriaMap['video_status']}]];
+        videoStatus = videoStatus == null ? "-1" : videoStatus;
+        $("#video_status_select").find('option[value="' + videoStatus + '"]').attr("selected", true);
+        $("#video_status").val(videoStatus);
+        $(function () {
+            $("#video_status_select").change(function () {
+                var videoStatus = $("#video_status_select").val()
+                $("#video_status").val(videoStatus);
+                $("#pageNum").val(1);//改变选项后,设置当前页号为1
+                $("#query_video_form").submit();
+            });
+        });
+
+
+        /**
+         * 查看视频详细信息
+         * @param dom
+         */
+        function showVideoInfo(dom) {
+            var videoId=$(dom).data('video-id');
+            $.ajax({
+                type: "GET",
+                url: window.webContextPath + "/video/video_details?video_id=" + videoId,
+                dataType: "html",
+                success: function (data, textStatus) {
+                    $("#videoInfoDialog").html(data);
+                    $("#videoInfoDialog").modal();
+                },
+                error: function () {
+                }
+            });
+        }
+
+        /**
+         * 打开审核视频模态框
+         * @param dom
+         */
+        function showCheckVideoModal(dom) {
+            var checkStatus=$(dom).data('check-status');
+            var videoId=$(dom).data('video-id');
+            $.ajax({
+                type: "GET",
+                data: {
+                    check_status: checkStatus,
+                    video_id: videoId
+                },
+                url: window.webContextPath + "/page/video/check",
+                dataType: "html",
+                success: function (data, textStatus) {
+                    $("#videoInfoDialog").html(data);
+                    $("#videoInfoDialog").modal();
+                },
+                error: function () {
+                }
+            });
+        }
+
+        /**
+         * 设置视频状态
+         * @param checkStatus  当前审核状态
+         * @param videoStatus
+         * @param videoId
+         */
+        function setVideoStatus(dom, videoStatus) {
+            var checkStatus=$(dom).data('check-status');
+            var videoId=$(dom).data('video-id');
+            if (1 == videoStatus) {
+                //恢复使用
+                if (2 == checkStatus || 5== checkStatus) {
+                    checkStatus++
+                } else {
+                    alert("视频审核状态错误!")
+                    return;
+                }
+            } else if (5 == videoStatus) {
+                //恢复使用
+                if (1 == checkStatus || 2 == checkStatus || 3 == checkStatus) {
+                    checkStatus = 2;
+                } else if (4== checkStatus || 5 == checkStatus || 6 == checkStatus) {
+                    checkStatus = 4;
+                } else {
+                    alert("视频审核状态错误!")
+                    return;
+                }
+            }else{
+                alert("管理员只能将视频设置为1(使用中)或5(已屏蔽)状态");
+                return;
+            }
+            var checkStatus;//当前审核状态
+            $.ajax({
+                type: "GET",
+                data: {
+                    video_status: videoStatus,
+                    video_id: videoId,
+                    check_status: checkStatus
+                },
+                url: window.webContextPath + "/video/set_status",
+                dataType: "json",
+                success: function (data, textStatus) {
+                    var rows = Number(data.data);
+                    if(1 == rows) {
+                        showAlertMsg("设置成功!");
+                        window.location.reload(true);
+                    } else {
+                        showAlertMsg("设置失败");
+                        $("#submit_button").attr("disabled", false);
+                    }
+
+                },
+                error: function () {
+                    alert('设置视频状态客户端异常');
+                }
+            });
+        }
+    </script>
+</div>
+</html>

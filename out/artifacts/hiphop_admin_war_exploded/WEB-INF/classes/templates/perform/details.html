@@ -1,0 +1,56 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span> <span class="sr-only">Close</span>
+            </button>
+            <h4 class="modal-title" >演出详细信息</h4>
+        </div>
+        <div class="modal-body">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">标题</label>
+                    <div class="col-sm-5">
+                        <span th:text="${performMap['perform_title']}" ></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">演出标签</label>
+                    <div class="col-sm-5">
+                        <span th:text="${performMap['tags']}" ></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label  class="col-sm-3 control-label">演出内容</label>
+                    <div class="col-sm-5">
+                        <span th:text="${performMap['perform_context']}" ></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">演出状态</label>
+                    <div class="col-sm-5" th:switch="${performMap['perform_status']}">
+                        <span th:case="1">发布中</span>
+                        <span th:case="2">已下架</span>
+                        <span th:case="3">已超时</span>
+                        <span th:case="*">未知状态</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label  class="col-sm-3 control-label">发布者</label>
+                    <div class="col-sm-5">
+                        <span th:text="${performMap['username']}" ></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label  class="col-sm-3 control-label">添加时间</label>
+                    <div class="col-sm-5">
+                       <span th:text="${performMap['add_time']!=null?#dates.format(performMap['add_time'], 'yyyy-MM-dd HH:mm:ss'):'未知'}"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="btn btn-default" data-dismiss="modal" id="dialogng">关闭</div>
+            </div>
+        </div>
+    </div>
+</div>

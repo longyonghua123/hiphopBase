@@ -1,0 +1,92 @@
+<!DOCTYPE html >
+<html lang="zh" th:replace="user/base_user (title='用户中心-修改密码')">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>用户中心-修改头像</title>
+    <style type="text/css">
+        body{
+            background-color: RGB(247,243,231);
+        }
+    </style>
+</head>
+<body>
+<div class="middle" th:fragment="content">
+    <style type="text/css">
+        #head_img:hover {
+            box-shadow: 1px 10px 10px 1px #1b6d85
+        }
+    </style>
+    <div id="upload_head_img">
+        <img th:src="${session.member_user.headImg==null?'/img/head_bg.jpg':session.member_user.headImg}" id="head_img" width="120" height="120" title="点击设置头像"/>
+        <button type="button" class="btn btn-primary" onclick="setHeadImg()">设置头像</button>
+    </div>
+    <div style="margin-top:60px">
+        <form>
+            <input type="hidden" id="head_img_input" name="headImg"/>
+            <input id="img_file" accept="image/*" type="file" style="display: none"/>
+        </form>
+    </div>
+    <script type="text/javascript">
+        /**
+         * 读取文件BASE64编码
+         * @param obj
+         * @returns {boolean}
+         */
+        function readFile(obj) {
+            var file = obj.files[0];
+            //判断类型是不是图片
+            if (!/image\/\w+/.test(file.type)) {
+                alert("请确保文件为图像类型");
+                return false;
+            }
+            var reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function (e) {e
+                var base64 = this.result;
+                $('#head_img_input').val(base64);
+                $('#head_img').attr('src', base64);
+            }
+        }
+
+        $(function () {//设置点击图片监听，调用文件资源管理器，选择图片
+            $('#head_img').click(function () {
+                $('#img_file').click();
+            });
+            $('#img_file').change(function () {
+                readFile(this);
+            });
+        });
+
+        function setHeadImg() {
+            var headImg = $("#head_img_input").val();
+            if ("" == headImg) {
+                alert("你未设置或更新头像！");
+                return;
+            }
+            if (!window.confirm('确定要设置头像吗?')) {
+                return;
+            }
+            $.ajax({
+                type: "post",
+                url: "/member/set_head_img",
+                cache: false,
+                dataType: "json",
+                data: {head_img: headImg},
+                success: function (result, textStatus, jqXHR) {
+                    if (0 == result.status && 1 == result.data) {
+                        alert("头像设置成功");
+                        window.location.reload(true);
+                    } else {
+                        alert(result.message);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus,
+                                 errorThrown) {
+                    alert("修改头像失败,返回状态码[" + textStatus + "]");
+                }
+            });
+        }
+    </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html >
+<html lang="zh" th:replace="user/base_user (title='用户中心-基本信息')">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>用户中心-基本信息</title>
+    <style type="text/css">
+        body{
+            background-color: RGB(247,243,231);
+        }
+    </style>
+</head>
+<body>
+
+<div th:fragment="content">
+    <ul style="padding-left: 0px">
+        <li style="float: none;">邮箱:<span th:text="${session.member_user.email}"></span></li>
+        <li style="float: none; margin-top: 15px">用户名:<span
+                th:text="${session.member_user.username==null?'未设置':session.member_user.username}"></span>
+        </li>
+        <li style="float: none; margin-top: 15px">昵称:<span
+                th:text="${session.member_user.nickname==null?'未设置':session.member_user.nickname}"></span>
+        </li>
+        <li style="float: none; margin-top: 15px">头像:
+            <img th:src="${session.member_user.headImg}" width="120" height="120"  th:if="${session.member_user.headImg!=null}"/>
+            <span th:if="${session.member_user.headImg==null}">未设置</span>
+        </li>
+    </ul>
+
+</div>
+
+</body>
+</html>

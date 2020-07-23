@@ -1,0 +1,148 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span> <span class="sr-only">Close</span>
+            </div>
+            <h4 class="modal-title">添加主菜单</h4>
+        </div>
+        <div class="modal-body" id="modalbody" roller="false" style="width: 90%; position: relative; overflow-x: hidden; overflow-y: auto;margin-left: auto;margin-right: auto;">
+            <form th:action="${#httpServletRequest.getContextPath()+'/menu/add_main_menu'}" method="post" id="add_main_menu_form">
+                <div id="alertMessage"></div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="control-label col-md-2" style="text-align: right;">菜单名称</label>
+                        <div class="col-sm-4">
+                            <input type="text" id="menu_name" class="form-control" name="menuName" />
+                        </div>
+                        <div class="col-sm-1">
+                            <span style="color:rgb(255,0,0)">*</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="control-label col-md-2" style="text-align: right;">菜单URL</label>
+                        <div class="col-sm-4">
+                            <input type="url" id="menu_url" class="form-control" name="menuUrl" />
+                        </div>
+                        <div class="col-sm-1">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="control-label col-md-2" style="text-align: right;">菜单LOGO</label>
+                        <div class="col-sm-3">
+                            <input type="hidden" name="menuLogo" id="menu_logo" />
+                            <input type="file" id="file" allowexts="gif,jpeg,jpg,png,bmp" accept="image/*" onchange="readFile(this)"/>
+                            <img id="menu_logo_img" class="am-img-thumbnail" alt="菜单LOGO"/>
+                            <div class="txtPic">上传LOGO</div>
+                        </div>
+                        <div class="col-sm-1">
+                        <button type="button" class="btn btn-link" onclick="clearLOGO()">清除LOGO</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <div class="btn btn-default" data-dismiss="modal" id="dialogng">关闭</div>
+                <button type="button" class="btn btn-primary" id="submit_button">
+                <span>添加主菜单</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function readFile(obj) {
+        var file = obj.files[0];
+        //判断类型是不是图片
+        if(!/image\/\w+/.test(file.type)) {
+            alert("请确保文件为图像类型");
+            return false;
+        }
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function(e) {
+            var base64 = this.result; //就是base64
+            $("#menu_logo").val(base64);
+            $("#menu_logo_img").attr('src', base64);
+        }
+    }
+    $(function() {
+        $(".txtPic").click(function() {
+            $("#file").click();
+        });
+
+        $("#submit_button").click(function() {
+            addMainMenu();
+        });
+    });
+    /**
+     *添加主菜单
+     */
+    function addMainMenu() {
+        $("#submit_button").attr("disabled", true);
+        filterFormInput();
+        var menuName = $("#menu_name").val();
+        if("" == menuName) {
+            showAlertMsg("请输入菜单名称");
+            window.setTimeout("clearAlertMsg()", 1000);
+            $("#submit_button").attr("disabled", false);
+            return;
+        }
+        var menuUrl = $("#menu_url").val();
+        if("" == menuUrl) {
+            showAlertMsg("请输入菜单URL");
+            window.setTimeout("clearAlertMsg()", 1000);
+            $("#submit_button").attr("disabled", false);
+            return;
+        }
+        //检查主菜单名称是已否被使用
+        $.ajax({
+            type: "post",
+            url: window.webContextPath+"/menu/check_main_menu",
+            data: {
+                menu_name: menuName
+            },
+            dataType: "json",
+            success: function(jsonData, textStatus) {
+                if(0 != jsonData.status) {
+                    showAlertMsg("检查主菜单名称是否被使用,服务器异常[" + jsonData.message + "]");
+                    window.setTimeout("clearAlertMsg()", 1000);
+                    $("#submit_button").attr("disabled", false);
+                    return;
+                }
+                var rows = Number(jsonData.data);
+                if(1 == rows) {
+                    showAlertMsg("主菜单名称已被使用");
+                    window.setTimeout("clearAlertMsg()", 1000);
+                    $("#submit_button").attr("disabled", false);
+                } else if(0 == rows) {
+                    if(window.confirm("确定要添加该主菜单信息吗?")) {
+                        $('#add_main_menu_form').submit();
+                    } else {
+                        $("#submit_button").attr("disabled", false);
+                    }
+
+                } else {
+                    showAlertMsg("检查主菜单名称是否被使用,服务器返回错误状态");
+                    window.setTimeout("clearAlertMsg()", 1000);
+                    $("#submit_button").attr("disabled", false);
+                }
+
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                showAlertMsg("检查主菜单名称是否被使用,客户端异常[" + errorThrown + "]");
+                window.setTimeout("clearAlertMsg()", 1000);
+                $("#submit_button").attr("disabled", false);
+            }
+        });
+    }
+    function clearLOGO()
+	{
+		$("#menu_logo_img").removeAttr('src');
+		$("#menu_logo").val("");
+	}
+</script>

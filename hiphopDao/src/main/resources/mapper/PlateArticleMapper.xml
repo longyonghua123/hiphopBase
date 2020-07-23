@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.olande.hiphop.mapper.PlateArticleMapper">
+
+    <!-- 根据文章ID查询文章详细信息-->
+    <select id="getArticleMap" parameterType="string" resultType="map">
+<![CDATA[
+        SELECT article_id,
+               article_title,
+               article_content,
+               tags,
+               article_link,
+               doc_name,
+               doc_content,
+               member_user_id,
+               pub_time,
+               check_status,
+               article_status,
+               a.update_time,
+               a.dict_code,
+               d.dict_name,
+               m.email,
+               m.username,
+               m.nickname,
+               m.head_img
+        FROM plate_article AS a
+                 LEFT JOIN member_user AS m ON a.member_user_id = m.member_id
+                 LEFT JOIN sys_dict_item AS d ON d.dict_code = a.dict_code
+        WHERE a.article_id = #{article_id}
+        ]]>
+    </select>
+</mapper>

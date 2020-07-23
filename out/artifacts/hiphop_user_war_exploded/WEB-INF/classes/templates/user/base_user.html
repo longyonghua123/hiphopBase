@@ -1,0 +1,112 @@
+<!DOCTYPE html >
+<script th:if="${session.member_user==null}">
+    //检查是否登录
+    window.location.href = '/page/login'
+</script>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title th:text="${title}"></title>
+    <link type="text/css" href="/css/yunku.css" rel="stylesheet"/>
+    <link type="text/css" href="/css/user.css" rel="stylesheet"/>
+    <link type="text/css" rel="stylesheet" href="/css/bootstrap/bootstrap.min.css"/>
+    <script type="text/javascript" src="/js/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/bootstarp/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/comment/info_message.js"></script>
+    <script th:inline="javascript">
+        //WEB根目录
+        window.webContextPath = [[${#httpServletRequest.getContextPath()}]];
+        $(function () {
+            $("body").width($(window).width());
+            var path = window.location.pathname;
+            $('#user_navi li').each(function () {
+                var url = $(this).data('url')
+                if (url == path) {
+                    $(this).removeClass('tag');
+                    $(this).addClass('tag_select');
+                    $(this).data('url', '');
+                    return false;
+                }
+            });
+            //设置昵称
+            var nickname = [[${session.member_user.nickname}]];
+            if (nickname != null) {
+                $('#user_call_span').text(nickname);
+                return;
+            }
+            var username = [[${session.member_user.username}]];
+            if (username != null) {
+                $('#user_call_span').text(username);
+                return;
+            }
+            var email = [[${session.member_user.email}]];
+            $('#user_call_span').text(email);
+        });
+    </script>
+    <style type="text/css">
+        body{
+            background-color: RGB(247,243,231);
+        }
+    </style>
+</head>
+<body>
+<div class="base">
+    <div class="head">
+        <div class="logo"></div>
+        <div>
+            <span class="span_index"><a href="/">hiphop首页</a></span>
+            <span class="span_sys">
+                欢迎回来!<span id="user_call_span"></span>
+                &nbsp;&nbsp;<a href="#" onclick="logout()">退出系统</a></span>
+        </div>
+    </div>
+    <div style="height: 25px;"></div>
+    <div>
+        <div class="user_logo">
+            <span class="user_center">用户中心 </span>
+        </div>
+        <div>
+            <ul class="user_navi" id="user_navi">
+                <li class="tag" data-url="/page/user/user_info">基本信息</li>
+                <li class="tag" data-url="/page/user/set_username">hiphop帐号</li>
+                <li class="tag" data-url="/page/user/set_nickname">设置昵称</li>
+                <li class="tag" data-url="/page/user/update_password">修改密码</li>
+                <li class="tag" data-url="/page/user/set_head">设置头像</li>
+                <li class="tag" data-url="/video/my_video_page">我的视频</li>
+                <li class="tag" data-url="/article/my_article_page">我的文章</li>
+                <!--<li class="tag" data-url="/page/user/my_order">我的订单</li>-->
+            </ul>
+        </div>
+    </div>
+    <div class="middle" th:include="::content">
+    </div>
+    <div class="bottom">
+        Copyright<span class="copy">&copy;</span>2020 Hiphop
+    </div>
+</div>
+<script type="text/javascript">
+    $('#user_navi li').each(function () {
+        $(this).click(function () {
+            var url = $(this).data("url");
+            if ('#' == url) {
+                alert('该功能未上线,敬请期待!');
+            } else if ('' == url) {
+            } else {
+                window.location.href = url;
+            }
+        });
+
+    });
+
+    /**
+     * 确定系统
+     */
+    function logout() {
+        if (window.confirm('确定要退出系统吗?')) {
+            window.location.href = '/member/logout';
+        }
+    }
+</script>
+</body>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>网页头部导航</title>
+</head>
+<body>
+<div class="top_bg" th:fragment="headContent">
+    <div class="wrap">
+        <div class="qrcode right mgt20">
+            <div class="right">
+                <!--<img src="/images/qrcode.jpg"/>-->
+            </div>
+            <div class="left" style="margin-top: -10px!important;" th:switch="${session.member_user!=null}">
+                <ul th:case="false">
+                    <li><a href="/page/register" >用户注册</a></li>
+                    <li><a href="/page/login">用户登录</a></li>
+                    <!--<li><a href="#">加入收藏</a></li>-->
+                    <li><a href="/index">网站导航</a></li>
+                </ul>
+                <ul th:case="true">
+                    <li><a href="/page/user/user_info" id="user_call_span">用户中心</a></li>
+                    <li><a href="#" onclick="logout()">退出系统</a></li>
+                    <!--<li><a href="#">加入收藏</a></li>-->
+                    <li><a href="/index">网站导航</a></li>
+                </ul>
+            </div>
+            <div class="clear">
+            </div>
+        </div>
+        <div class="logo left">
+            <img src="/images/logo.png"/>
+        </div>
+        <div class="clear">
+        </div>
+        <script th:if="${session.member_user!=null}" th:inline="javascript">
+            $(function(){
+                //设置昵称
+                var nickname = [[${session.member_user.nickname}]];
+                if (nickname != null) {
+                    $('#user_call_span').text(nickname);
+                    return;
+                }
+                var username = [[${session.member_user.username}]];
+                if (username != null) {
+                    $('#user_call_span').text(username);
+                    return;
+                }
+                var email = [[${session.member_user.email}]];
+                $('#user_call_span').text(email);
+            });
+
+            /**
+             * 确定系统
+             */
+            function logout() {
+                if (window.confirm('确定要退出系统吗?')) {
+                    window.location.href = '/member/logout';
+                }
+            }
+        </script>
+    </div>
+</div>
+</body>
+</html>

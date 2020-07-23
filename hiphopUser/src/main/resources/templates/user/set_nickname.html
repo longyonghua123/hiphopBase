@@ -1,0 +1,74 @@
+<!DOCTYPE html  >
+<html lang="zh" th:replace="user/base_user (title='用户中心-设置昵称')">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>用户中心-设置昵称</title>
+    <style type="text/css">
+        body{
+            background-color: RGB(247,243,231);
+        }
+    </style>
+</head>
+<body>
+<div th:fragment="content">
+    <form  action="#" method="post">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-4">
+                    <input type="text" class="form-control" id="nickname" name="nickname" placeholder="请输入昵称" th:value="${session.member_user.nickname!=null?session.member_user.nickname:''}"/>
+                </div>
+                <div class="col-md-4">
+                    <span style="color: #0000FF;font-size: 14px">昵称不能包含空白字符</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row" style="color: #FF0000;font-size: 14px">注:空白字符有 " " (空格符)、\r (回车符)、\n (换行符)、\t (制表符) 和 \f (换页符)</div>
+        </div>
+        <div class="form-group">
+            <div>
+                <button type="button" class="btn btn-primary" onclick="setNickname()">设置昵称</button>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            //设置用户
+            function setNickname() {
+                var nickname = $('#nickname').val();
+                if ("" == nickname) {
+                    alert("请输入昵称");
+                    return;
+                }
+                if(nickname==[[${session.member_user.nickname}]]){
+                    alert("您未修改昵称");
+                    return;
+                }
+
+                var exp = /\s+/g;
+                if (nickname.match(exp)!=null) {
+                    alert("昵称不能含有空白字符");
+                    return;
+                }
+                if (!window.confirm("确定修改昵称吗?")) {
+                    return;
+                }
+                $.ajax({
+                    url: '/member/set_nickname',
+                    type: 'POST',
+                    data: {nickname: nickname},
+                    dataType: 'json',
+                    success: function (result) {
+                        var status = result.status;
+                        if (0 == result.status && 1 == result.data) {
+                            alert("设置成功");
+                            window.location.reload(true);
+                        } else {
+                            alert(result.message);
+                        }
+                    }
+                });
+            }
+        </script>
+    </form>
+</div>
+</body>
+</html>

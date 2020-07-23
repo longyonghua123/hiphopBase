@@ -1,0 +1,180 @@
+<!DOCTYPE html >
+<html lang="en" th:replace="common/base (title='演出列表')">
+<!-- layout文件路径-->
+<div th:fragment="content">
+    <ol class="breadcrumb">
+        <li>当前位置:演出查询</li>
+    </ol>
+    <div class="container-fluid" style="padding-left: 0px;">
+        <div class="well">
+            <div class="form-group" style="line-height: 32px;width: 100%">
+                <div class="row">
+                    <div style="width: 120px;float: left;" onclick="showAddPerformDialog()" id="new-btn"
+                         data-loading-text="Loading..." class="btn btn-default">
+                        <span>新增演出</span>
+                    </div>
+                    <div style="float: left;padding-left: 20px"><span class="control-label">演出状态</span></div>
+                    <div style="width:400px!important;padding-left:200px">
+                        <select id="perform_status_select" class="form-control">
+                            <option disabled="disabled">---请选择---</option>
+                            <option value="0">全部</option>
+                            <option value="1">发布中</option>
+                            <option value="2">已下架</option>
+                            <option value="3">已过期</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="scrollContent" style="width: 99%">
+        <form id="query_perform_form" name="form" method="post" action="/perform/query_page">
+            <table align="center" class="table table-hover table-striped" id="dataTables-example"
+                   style="table-layout:fixed;" expandable="true" width="100%">
+                <thead>
+                <tr>
+                    <th width="5%">
+                        <span>序号</span>
+                    </th>
+                    <th width="10%">
+                        <span>演出标题</span>
+                    </th>
+                    <th width="15%">
+                        <span>演出类型</span>
+                    </th>
+                    <th width="10%">
+                        <span>演出状态</span>
+                    </th>
+                    <th width="10%">
+                        <span>发布者</span>
+                    </th>
+                    <th width="10%">
+                        <span>发布时间</span>
+                    </th>
+                    <th width="10%">
+                        <span>查看</span>
+                    </th>
+                    <th width="20%">
+                        <span>操作</span>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(page.records)}">
+                    <td colspan="8" style="text-align: center;color: #FF0000">没有查询到任何演出数据</td>
+                </tr>
+                <tr th:if="${not #lists.isEmpty(page.records)}" th:each="perform:${page.records}">
+                    <td th:text="${performStat.index+1}"></td>
+                    <td th:text="${perform.performTitle}"></td>
+                    <td th:text="${perform.dictItem!=null?perform.dictItem.dictName:'未知'}"></td>
+                    <td th:switch="${perform.performStatus}">
+                        <span th:case="1">上架中</span>
+                        <span th:case="2">已下架</span>
+                        <span th:case="3">已过期</span>
+                        <span th:case="*">未知</span>
+                    </td>
+                    <td th:text="${perform.addSysUser==null?'未知':perform.addSysUser.username}"></td>
+                    <td th:text="${perform.addTime!=null?#dates.format(perform.addTime, 'yyyy-MM-dd HH:mm:ss'):'未知'}"></td>
+                    <td>
+                        <button type='button' class='btn btn-link' th:data-perform-id="${perform.performId}"
+                                onclick="showPerformInfo(this)">查看
+                        </button>
+                    </td>
+                    <td th:switch="${perform.performStatus}">
+                        <button th:case="1" type='button' class='btn btn-link'
+                                th:data-perform-id="${perform.performId}"  th:data-perform-title="${perform.performTitle}"
+                                onclick="setPerformStatus(this,2)">下架
+                        </button>
+                        <button th:case="2" type='button' class='btn btn-link'
+                                th:data-perform-id="${perform.performId}" th:data-perform-title="${perform.performTitle}"
+                                onclick="setPerformStatus(this,1)">上架
+                        </button>
+                        <span th:case="3">--</span>
+                        <span th:case="*">未知状态</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div></div>
+            <div th:replace="common/page::pageContext"></div>
+            <!-- 使用状态-->
+            <input type="hidden" id="perform_status" name="perform_status"/>
+        </form>
+    </div>
+    <div class="modal fade" id="performInfoDialog" tabindex="-1" role="dialog" aria-labelledby="versionEditLabel"
+         aria-hidden="true"></div>
+
+    <script type="text/javascript" th:inline="javascript">
+        //初始化演出查询状态
+        var performStatus = [[${page.criteriaMap==null?-1:page.criteriaMap['perform_status']}]];
+        performStatus = performStatus == null ? "0" : performStatus;
+        $("#perform_status_select").find('option[value="' + performStatus + '"]').attr("selected", true);
+        $("#perform_status").val(performStatus);
+        $(function () {
+            $("#perform_status_select").change(function () {
+                var performStatus = $("#perform_status_select").val()
+                $("#perform_status").val(performStatus);
+                $("#pageNum").val(1);//改变选项后,设置当前页号为1
+                $("#query_perform_form").submit();
+            });
+        });
+
+
+        /**
+         *修改文章状态,即上架或下架文章
+         */
+        function setPerformStatus(dom, performStatus) {
+            var performId = $(dom).data('perform-id');
+            var performTitle = $(dom).data('perform-title');
+            if (!(1 == performStatus || 2 == performStatus)) {
+                alert('演出状态错误');
+                return;
+            }
+            var message = 2 == performStatus ? '确定下架该演出【' + performTitle + '】吗?' : '确定上架该演出【' + performTitle + '】吗?'
+
+            if (window.confirm(message)) {
+                var current = $("#pageNum").val();
+                var url = window.webContextPath + '/perform/set_status?perform_status=' + performStatus + '&amp;current=' + current + '&amp;perform_id=' + performId + '&amp;rd=' + Math.random();
+                url = replaceSpecialChars(url);
+                window.location.href = url;
+            }
+        }
+
+        /**
+         * 查看演出详细信息
+         */
+        function showPerformInfo(dom) {
+            var performId = $(dom).data('perform-id');
+            $.ajax({
+                type: "GET",
+                url: window.webContextPath + "/perform/perform_details?perform_id=" + performId,
+                dataType: "html",
+                success: function (data, textStatus) {
+                    $("#performInfoDialog").html(data);
+                    $("#performInfoDialog").modal();
+                },
+                error: function () {
+                }
+            });
+        }
+
+        /**
+         *
+         * @param main_dict_id
+         */
+        function showAddPerformDialog() {
+            $.ajax({
+                type: "get",
+                url: window.webContextPath + "/page/perform/add_perform",
+                dataType: "html",
+                success: function (data, textStatus) {
+                    $("#performInfoDialog").html(data);
+                    $("#performInfoDialog").modal();
+                },
+                error: function () {
+                }
+            });
+        }
+    </script>
+</div>
+</html>

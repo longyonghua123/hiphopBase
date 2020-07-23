@@ -1,0 +1,56 @@
+<!DOCTYPE>
+<html>
+<head>
+    <title>Hiphop中文网—文章阅读</title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+    <link rel="Stylesheet" type="text/css" href="/css/css.css" charset="gb2312"/>
+    <script type="text/javascript" src="/js/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="/js/main.js"></script>
+    <script type="text/javascript" src="/js/jquery.slides.js"></script>
+    <script type="text/javascript" src="/js/slider.js"></script>
+</head>
+<body>
+<!------------头部-------------->
+<div class="top_bg" th:replace="common/head::headContent">
+</div>
+<!------------搜索条-------------->
+<div class="top_bg" th:replace="common/search::searchContent"></div>
+<!------------您的位置-------------->
+<div class="wrap weizhi">
+    <div class="left" style="margin-top: 10px; margin: 10px;">
+        <img src="/images/weizhi.png "/></div>
+    <div class="left">
+        <h3>您的当前位置:文章检索&gt;文章查看</h3>
+    </div>
+    <div class="clear">
+    </div>
+</div>
+
+<div class="shigetaitou">
+    <!--<div class="right sr_qrcode"><img src="/images/qrcode.jpg" width="70" height="70"/></div>-->
+    <div class="left avatar1"><img
+            th:src="${articleMap.head_img!=null?articleMap.head_img:'/images/avatar/default_head_img.png'}"
+            th:alt="${articleMap.email}"/></div>
+    <div class="left shigeInfo">
+        <h2 th:text="${articleMap.article_title}"></h2>
+        <h5><span>作者:</span><span th:text="${articleMap.email}"></span><span>来源：本站原创</span><span>发布时间：</span><span
+                th:text="${articleMap.pub_time!=null?#dates.format(articleMap.pub_time, 'yyyy-MM-dd HH:mm:ss'):'未知'}"></span>
+        </h5>
+    </div>
+    <div class="clear"></div>
+</div>
+<!------------文章内容-------------->
+<div id="article_context" class="shigeneirong">
+    <div class="clear"></div>
+</div>
+<script th:inline="javascript">
+    $(function () {
+        $('#article_context').html([[${articleMap.article_content}]]);
+    });
+</script>
+
+<!------------尾部-------------->
+<div class="footer" th:replace="common/bottom::bottomContent">
+</div>
+</body>
+</html>

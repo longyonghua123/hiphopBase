@@ -1,0 +1,74 @@
+<!DOCTYPE html  >
+<html lang="zh" th:replace="user/base_user (title='用户中心-设置帐号')">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>用户中心-设置帐号</title>
+    <style type="text/css">
+        body{
+            background-color: RGB(247,243,231);
+        }
+    </style>
+</head>
+<body>
+<div th:fragment="content">
+    <div th:switch="${session.member_user.username!=null}">
+        <div th:case="true"><b>用户名:</b><span th:text="${session.member_user.username}"></span></div>
+        <form th:case="false" action="/member/set_username" method="post">
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" id="username" name="username"
+                               placeholder="请输入用户名"/>
+                    </div>
+                    <div class="col-md-4">
+                        <span style="color: #0000FF;font-size: 14px">用户名以字母开头,后跟数字、下划线.长度为4-20个字符</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row" style="color: #FF0000;font-size: 14px">注:用户名是唯一的,设置成功后不可以更改,请慎重操作!!!</div>
+            </div>
+            <div class="form-group">
+                <div>
+                    <button type="button" class="btn btn-primary" onclick="setUsername()">设置用户名</button>
+                </div>
+            </div>
+            <script type="text/javascript">
+                //设置用户
+                function setUsername() {
+                    var username = $('#username').val();
+                    if ("" == username) {
+                        alert("请输入用户名");
+                        return;
+                    }
+                    var regex = /^[a-zA-Z][a-zA-Z_0-9_]{3,19}$/;
+                    if (!regex.test(username)) {
+                        alert("用户名格式错误");
+                        return;
+                    }
+                    if (!window.confirm("用户名设置后不可以修改,确定要修改吗?")) {
+                        return;
+                    }
+                    $.ajax({
+                        url: '/member/set_username',
+                        type: 'POST',
+                        data: {username: username},
+                        dataType: 'json',
+                        success: function (result) {
+                            var status = result.status;
+                            if (0 == result.status && 1 == result.data) {
+                                alert("设置成功");
+                                window.location.reload(true);
+                            } else {
+                                alert(result.message);
+                            }
+                        }
+                    });
+                }
+            </script>
+        </form>
+
+    </div>
+</div>
+</body>
+</html>

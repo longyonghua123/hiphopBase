@@ -1,0 +1,159 @@
+<!DOCTYPE html >
+<html th:replace="common/base (title='主菜单维护')">
+    <!-- layout文件路径-->
+    <div th:fragment="content">
+        <style type="text/css">
+            #mainMenuDialog .modal-dialog {
+                width: 900px;
+            }
+
+            .record_td {
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                word-break: keep-all;
+            }
+        </style>
+        <style type="text/css">
+            .am-img-thumbnail {
+                display: inline-block;
+                width: 122px;
+                height: 122px;
+                padding: 2px;
+                line-height: 1.6;
+                background-color: #fff;
+                border: 1px solid #ddd;
+                border-radius: 0;
+                -webkit-transition: all 0.2s ease-in-out;
+                transition: all 0.2s ease-in-out;
+            }
+
+            .txtPic {
+                background: rgb(25, 118, 175);
+                color: #fff;
+                height: 25px;
+                width: 122px;
+                text-align: center;
+                line-height: 25px;
+                cursor: pointer;
+            }
+
+            input[type='file'] {
+                display: none;
+            }
+        </style>
+
+        <ol class="breadcrumb">
+            <li>当前位置:主要菜单维护</li>
+        </ol>
+        <div class="container-fluid" style="padding-left: 0px;">
+            <div class="well">
+                <div class="form-group" style="line-height: 32px;width: 100%">
+                    <div class="row">
+                        <div style="width: 120px" onclick="showAddMainMenuDialog()" id="new-btn"
+                             data-loading-text="Loading..." class="btn btn-default">
+                            <span>新增主菜单</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="scrollContent" style="width: 99%">
+            <table align="center" class="table table-hover table-striped" id="dataTables-example"
+                   style="table-layout:fixed;" expandable="true" width="100%">
+                <thead>
+                    <tr style="text-align:center">
+                        <th width="15%" style="text-align:center">
+                            <span>菜单名称</span>
+                        </th>
+                        <th width="15%" style="text-align:center">
+                            <span>菜单URL</span>
+                        </th>
+                        <th width="10%" style="text-align:center">
+                            <span>使用状态</span>
+                        </th>
+                        <th width="10%" style="text-align:center">
+                            <span>添加时间</span>
+                        </th>
+                        <th width="15%" style="text-align:center">
+                            <span>操作</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(menuList)}">
+                        <td colspan="5" style="text-align: center;color: #FF0000">没有查询到任何主菜单数据</td>
+                    </tr>
+                    <tr th:if="${not #lists.isEmpty(menuList)}" th:each="menu:${menuList}">
+                        <td th:text="${menu.menuName}"></td>
+                        <td th:text="${menu.menuUrl}"></td>
+                        <td th:text="${1==menu.useStatus?'使用中':'已停用'}"></td>
+                        <td th:text="${#dates.format(menu.addTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                        <td th:switch="${menu.useStatus}">
+                            <button th:case="1" type="button" class="btn btn-link" th:data-menu-name="${menu.menuName}" th:data-menu-id="${menu.menuId}"
+                                    onclick="setMainMenuStatus(this,2)">停用
+                            </button>
+                            <button th:case="2" type="button" class="btn btn-link" th:data-menu-name="${menu.menuName}" th:data-menu-id="${menu.menuId}"
+                                    onclick="setMainMenuStatus(this,1)">复用
+                            </button>
+                            <span th:case="*">菜单状态错误</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="modal fade" id="mainMenuDialog" tabindex="-1" role="dialog" aria-labelledby="versionEditLabel"
+             aria-hidden="true"></div>
+        <script type="text/javascript">
+            function showAddMainMenuDialog() {
+                $.ajax({
+                    type: "post",
+                    url: window.webContextPath + "/page/menu/add_main_menu",
+                    dataType: "html",
+                    success: function (data, textStatus) {
+                        $("#mainMenuDialog").html(data);
+                        $("#mainMenuDialog").modal();
+                    },
+                    error: function () {
+                    }
+                });
+            }
+
+            function showUpdateMainMenuDialog(main_menu_id) {
+                $.ajax({
+                    type: "post",
+                    data: {main_menu_id: main_menu_id},
+                    url: window.webContextPath + "/page/menu/update_main_menu",
+                    dataType: "html",
+                    success: function (data, textStatus) {
+                        $("#mainMenuDialog").html(data);
+                        $("#mainMenuDialog").modal();
+                    },
+                    error: function () {
+                    }
+                });
+            }
+
+            /**
+             *设置主菜单状态,即停用或复用主菜单
+             * @param dom
+             * @param useStatus
+             */
+            function setMainMenuStatus(dom, useStatus) {
+                var menuId = $(dom).data('menu-id');
+                var menuName=$(dom).data('menu-name');
+                if (!(0 == useStatus || 1 == useStatus)) {
+                    alert('菜单状态错误');
+                    return;
+                }
+                var message = 0 == useStatus ? '确定停止使用主菜单【'+menuName+'】吗?' : '确定恢复使用主菜单【'+menuName+'】吗?'
+                if (window.confirm(message)) {
+                    var url = window.webContextPath + '/menu/set_menu_status?use_status=' + useStatus + '&amp;menu_id=' + menuId + '&amp;rd=' + Math.random();
+                    url = replaceSpecialChars(url);
+                    window.location.href = url;
+                }
+            }
+        </script>
+    </div>
+</html>

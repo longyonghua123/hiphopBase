@@ -1,0 +1,16 @@
+.yum {
+	background-image: url('../img/yum.png');
+	background-repeat: no-repeat;
+	background-position: left center;
+}
+
+.yum-logo-text {
+	padding-left: 60px;
+}
+
+.text_slice {
+	display: block;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}

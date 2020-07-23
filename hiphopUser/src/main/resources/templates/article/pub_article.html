@@ -1,0 +1,137 @@
+<script th:if="${session.member_user==null}">
+    //检查是否登录
+    window.location.href = '/page/login'
+</script>
+<html>
+<head>
+    <title>发布文章</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <link type="text/css" rel="stylesheet" href="/css/bootstrap/bootstrap.min.css"/>
+    <script type="text/javascript" src="/js/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/bootstarp/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/comment/info_message.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/js/ueditor/ueditor.config.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/js/ueditor/editor_api.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/js/ueditor/lang/zh-cn/zh-cn.js"></script>
+
+    <style type="text/css">
+        div {
+            width: 100%;
+
+        }
+        body{
+            background-color: RGB(247,243,231);
+        }
+    </style>
+</head>
+<body>
+<div id="alertMessage"></div>
+<div>
+    <div><h3>发表文章</h3></div>
+    <form action="/article/add" method="post" id="add_article_form">
+    <div style="width:300px"><b>文章类型:</b>
+        <select id="dict_code_select" name="dictCode" class="form-control" style="width:60%!important; display: inline!important;">
+            <option disabled="disabled" selected="selected">---请选择文章类型---</option>
+        </select>
+    </div>
+    <div><b>文章标题:</b><input type="text" id="article_title" name="articleTitle"/></div>
+    <div id="editor_div"><b>文章内容</b></div>
+    <div><b>文章标签:</b><input type="text" id="tags" name="tags"/></div>
+    <div>
+        <button type="button" class="btn btn-primary" onclick="clearArticleData()"> 重新填写</button>
+        <button type="button" class="btn btn-primary" onclick="pubArticle()"> 发表文章</button>
+    </div>
+        <input type="hidden" id="article_content" name="articleContent"/>
+    </form>
+    <script type="text/javascript">
+        function clearLocalData() {
+            UE.getEditor('editor').execCommand("clearlocaldata");
+        }
+
+        $(function () {
+            var scriptDom = document.createElement("script");
+            scriptDom.id = 'editor';
+            scriptDom.type = 'text/plain';
+            scriptDom.style.width = '1024px';
+            scriptDom.style.height = '300px';
+            document.getElementById('editor_div').appendChild(scriptDom);
+            //实例化编辑器
+            var ue = UE.getEditor('editor');
+            loadArticleTypes();
+        });
+    </script>
+</div>
+<script>
+    function pubArticle() {
+        var dictCode=$('#dict_code_select').val();
+        if ('' == dictCode) {
+            showAlertMsg('请选择文章类型');
+            window.setTimeout('clearAlertMsg()',1000);
+            return;
+        }
+        var articleTitle = $('#article_title').val();
+        if ('' == articleTitle) {
+           showAlertMsg('请输入文章标题');
+           window.setTimeout('clearAlertMsg()',1000);
+           return;
+        }
+        var articleContext = UE.getEditor('editor').execCommand("getlocaldata");
+        if ('' == articleContext) {
+            showAlertMsg('请填写文章内容');
+            window.setTimeout('clearAlertMsg()',1000);
+            return;
+        }
+        var tags=$('#tags').val();
+        if(""==tags){
+            showAlertMsg('请输入文章标签');
+            window.setTimeout('clearAlertMsg()',1000);
+            return;
+        }
+        if(window.confirm('确定要添加文章吗?')){
+            $('#article_content').val(articleContext);
+            $('#add_article_form').submit();
+        }
+    }
+
+    /***
+     * 加载文章类型
+     */
+    function loadArticleTypes(){
+        $.ajax({
+            url: '/dict/load_sub_dict?p_dict_code=100000&use_status=1',
+            type: 'GET',
+            dataType: 'json',
+            success: function (result) {
+                var status = result.status;
+                if (0 != status) {
+                    alert('加载文章类型数据失败');
+                    return;
+                }
+                var dictList=result.data;
+                if(0==dictList){
+                    alert('未加载到文章数据');
+                    return;
+                }
+                $(dictList).each(function(){
+                    var dictCode=this.dictCode;
+                    var dictName=this.dictName;
+                    var optionHTML='<option value="'+dictCode+'">'+dictName+'</option>';
+                    $('#dict_code_select').append(optionHTML);
+                });
+            },
+            error: function (e) {
+                alert('客户端异常');
+            }
+        });
+    }
+
+    /**
+     * 清除数据
+     */
+    function clearArticleData() {
+        UE.getEditor('editor').execCommand("clearlocaldata");
+        $('#add_article_form')[0].reset();
+    }
+</script>
+</body>
+</html>

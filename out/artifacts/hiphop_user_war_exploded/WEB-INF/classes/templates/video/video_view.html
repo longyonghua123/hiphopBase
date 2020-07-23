@@ -1,0 +1,99 @@
+<!DOCTYPE>
+<html>
+<head>
+    <title>Hiphop中文网——视频播放</title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+    <link rel="Stylesheet" type="text/css" href="/css/css.css" charset="gb2312"/>
+    <script type="text/javascript" src="/js/jquery-1.7.2.min.js"></script>
+
+</head>
+<body>
+<!------------头部-------------->
+<div class="top_bg" th:replace="common/head::headContent"></div>
+<!------------搜索条-------------->
+<div class="top_bg" th:replace="common/search::searchContent"></div>
+<!------------您的位置-------------->
+<div class="wrap weizhi">
+    <div class="left" style="margin-top: 10px; margin: 10px;">
+        <img src="/images/weizhi.png "/></div>
+    <div class="left">
+        <h3>
+            您的当前位置:视频检索&gt;视频查看</h3>
+    </div>
+    <div class="clear">
+    </div>
+</div>
+
+<div class="shigetaitou">
+    <!--<div class="right sr_qrcode"><img src="/images/qrcode.jpg" width="70" height="70"/></div>-->
+    <div class="left avatar1"><img th:src="${videoMap.head_img!=null?videoMap.head_img:'/images/avatar/default_head_img.png'}" th:alt="${videoMap.email}"/></div>
+    <div class="left shigeInfo">
+        <h2 th:text="${videoMap.video_name}"></h2>
+        <h5><span>作者:</span><span th:text="${videoMap.email}"></span><span>来源：本站原创</span><span>发布时间：</span><span th:text="${videoMap['update_time']!=null?#dates.format(videoMap['update_time'], 'yyyy-MM-dd HH:mm:ss'):'未知'}"></span>
+        </h5>
+    </div>
+    <div class="clear"></div>
+</div>
+<!------------视频内容-------------->
+<div id="video_context" class="shigeneirong">
+    <div>
+        <video id="hiphop_video"
+               th:poster="${videoMap.video_face_img!=null?videoMap.video_face_img:'/img/start_img.jpg'}"
+               width="600" height="450" autoplay="autoplay" controls="controls">
+        </video>
+    </div>
+    <div class="clear"></div>
+</div>
+<script th:inline="javascript">
+</script>
+
+<!------------尾部-------------->
+<div class="footer" th:replace="common/bottom::bottomContent"></div>
+
+<script th:inline="javascript">
+    /**
+     * 获取视频blob路径
+     * @param videoUrl
+     */
+    function getVideoBlobURL(videoUrl) {
+        var xmlHttpRequest = new XMLHttpRequest();
+//配置请求方式、请求地址以及是否同步
+        xmlHttpRequest.open('GET', '/video/get_blob?video_url=' + videoUrl, true);
+//设置请求结果类型为blob
+        xmlHttpRequest.responseType = 'blob';
+//请求成功回调函数
+        xmlHttpRequest.onload = function (e) {
+            if (this.status == 200) {//请求成功
+                //获取blob对象
+                var blob = this.response;
+                //获取blob对象地址，并把值赋给容器
+                var blobUrl = URL.createObjectURL(blob);
+                $("#hiphop_video").attr("src", blobUrl);
+                console.info(blobUrl);
+            }
+        };
+        xmlHttpRequest.send();
+
+    }
+
+    $(function () {
+        getVideoBlobURL([[${videoMap.video_url}]]);
+        $('#hiphop_video').bind('play', function () {
+            //this.muted = false;
+        });
+        $('#hiphop_video').bind('error', function () {
+            showAlertMsg('视频加载失败');
+        });
+        $('#hiphop_video').bind('canplay', function () {
+            //加载完成后,隐藏加载图标
+            //$('#loading_div').hide();
+        });
+
+        $('#hiphop_video').bind('loadstart', function () {
+            //加载数据时,显示加载图标
+            //$('#loading_div').css({display:'block'});
+        });
+    })
+</script>
+</body>
+</html>

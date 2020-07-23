@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Hiphop中文网——视频检索</title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+    <link rel="Stylesheet" type="text/css" href="/css/css.css" charset="gb2312"/>
+    <script type="text/javascript" src="/js/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="/js/main.js"></script>
+    <script type="text/javascript" src="/js/jquery.slides.js"></script>
+    <script type="text/javascript" src="/js/slider.js"></script>
+</head>
+<body>
+<!------------头部-------------->
+<div class="top_bg" th:replace="common/head::headContent"></div>
+<!------------搜索条-------------->
+<div class="top_bg" th:replace="common/search::searchContent"></div>
+<!------------您的位置-------------->
+<div class="wrap weizhi">
+    <div class="left" style="margin-top: 10px; margin: 10px;">
+        <img src="/images/weizhi.png "/></div>
+    <div class="left">
+        <h3>
+            您的当前位置:视频检索</h3>
+    </div>
+    <div class="clear">
+    </div>
+</div>
+
+<!------------列表页-------------->
+<div class="wrap yunliebiao">
+    <ul th:if="${ not #lists.isEmpty(page.records)}" th:each="video:${page.records}">
+        <li class="yun_item">
+            <div class="right" onclick="watchVideo(this)" th:data-video-id="${video.videoId}">
+                <h1 th:text="${video.videoName}" ></h1>
+                <h3>
+                    <span th:text="${video.uploadTime!=null?#dates.format(video.uploadTime, 'yyyy-MM-dd HH:mm:ss'):'未知'}"></span>
+                    <span>作者:</span><span th:text="${video.member!=null?video.member.email:'未知'}"></span>
+                </h3>
+                <h5 th:text="${video.videoDesc!=null?video.videoDesc:'暂无视频描述信息'}"></h5>
+            </div>
+            <div class="left">
+                <img th:src="${video.videoFaceImg!=null?video.videoFaceImg:'/images/yun/yun1.jpg'}"/>
+            </div>
+            <div class="clear">
+            </div>
+        </li>
+    </ul>
+    <script>
+        function watchVideo(dom) {
+            var videoId=$(dom).data('video-id');
+            window.open('/video/'+videoId+'.html','watchVideo');
+        }
+    </script>
+    <span th:if="${#lists.isEmpty(page.records)}" style="color: #0000FF;font-size: 14px">未查询到相关视频数据</span>
+    <div class="clear">
+    </div>
+    <!------------分页栏-------------->
+    <div id="page_list" class="inputPager_page" th:if="${page!=null &&  not #lists.isEmpty(page.pageNumList)}"
+         th:each="pageNub:${page.pageNumList}">
+        <a class="p_cur" th:if="${pageNub==page.current}" th:text="${pageNub}"></a>
+        <a class="p_num" href="#" th:if="${pageNub<=page.totalPage && pageNub!=page.current}"  th:text="${pageNub}"></a>
+    </div>
+</div>
+<!------------尾部-------------->
+<div class="footer" th:replace="common/bottom::bottomContent"></div>
+</body>
+</html>

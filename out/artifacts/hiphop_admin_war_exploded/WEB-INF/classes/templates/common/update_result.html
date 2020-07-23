@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>修改结果页面</title>
+    <script th:inline="javascript">
+        //获取修改状态
+        var result = [[${param.result}]];
+        if (1 == result) {
+            alert("修改成功");
+        } else {
+            alert("执行修改操作,返回器返回未知状态!")
+        }
+        //修改或失败后返回的页面
+        var returnURL = [[${param.result_url}]];
+        if (returnURL != null) {
+            returnURL = decodeURI(returnURL);
+            window.location.href = returnURL;
+        } else {
+            //未传值返回页面,跳转首页
+            window.location.href = "/page/admin/index";
+        }
+
+
+    </script>
+</head>
+<body>
+
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<script th:if="${session.sysUser!=null}" type="javascript">
+    window.location.href="/page/main";
+</script>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>系统登录</title>
+    <link th:href="${#httpServletRequest.getContextPath()+'/res/skin/css/style.css'}" rel="stylesheet" type="text/css"/>
+    <script th:src="${#httpServletRequest.getContextPath()+'/res/skin/js/jquery.js'}" type="text/javascript"></script>
+    <script th:src="${#httpServletRequest.getContextPath()+'/res/skin/js/cloud.js'}"  type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('.loginbox').css({
+                'position': 'absolute',
+                'left': ($(window).width() - 692) / 2
+            });
+            $(window).resize(function () {
+                $('.loginbox').css({
+                    'position': 'absolute',
+                    'left': ($(window).width() - 692) / 2
+                });
+            });
+        });
+    </script>
+</head>
+<body style="background-color:#1c77ac; background-image:url(${basePath}res/skin/images/light.png); background-repeat:no-repeat; background-position:center top; overflow:hidden;">
+<div id="mainBody">
+    <div id="cloud1" class="cloud"></div>
+    <div id="cloud2" class="cloud"></div>
+</div>
+<div class="logintop">
+    <span>Hiphop网站后台管理系统</span>
+    <ul>
+        <li>
+            <a href="#">联系我们</a>
+        </li>
+        <li>
+            <a href="#">帮助</a>
+        </li>
+        <li>
+            <a href="#">关于Hiphop</a>
+        </li>
+    </ul>
+</div>
+<div class="loginbody">
+    <form  action="/admin/login" method="post">
+        <div class="loginbox">
+            <ul>
+                <li class="msg"></li>
+                <li><input id="username" name="username" type="text" class="loginuser"  placeholder="用户名" /></li>
+                <li><input id="password" name="password" type="password" class="loginpwd" /></li>
+                <li><input  type="button" class="loginbtn" value="登录" onclick="managerUserLogin()" /></li>
+            </ul>
+        </div>
+    </form>
+</div>
+<div class="loginbm">版权所有&nbsp;&nbsp;&nbsp;&nbsp;Hiphop网站研发团队</div>
+<script type="text/javascript">
+    function managerUserLogin()
+    {
+        var password=$("#password").val();
+        var username =$("#username").val();
+        // var status=session.getAttribute("user").useStatus;
+        if(""==username||""==password)
+        {
+            $(".msg").text("请输入用户名或密码");
+            window.setTimeout('$(".msg").text("")', 1000);
+            return ;
+        }
+        // if(status==0){
+        //     $(".msg").text("该管理员账户已被注销，请联系超级管理员");
+        // }
+        $("form:first").submit();
+    }
+</script>
+</body>
+</html>

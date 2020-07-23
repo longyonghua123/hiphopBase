@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>HIPHOP文化爱好者交流平台</title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+    <meta name="description" content="致力于推广Hiphop文化，打造中国最具影响力的嘻哈文化交流平台，为广大嘻哈文化爱好者分享街舞、说唱、涂鸦、dj、bbox等嘻哈文化相关资讯、教学与视频！"/>
+    <meta name="keywords" content="嘻哈中国,街舞,说唱,涂鸦,dj,bbox"/>
+    <meta name="viewport"
+          content="width=device-width,height=device-height,inital-scale=1.0,maximum-scale=1.0,user-scalable=no;"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <style type="text/css">
+        img {
+            border: 0;
+        }
+
+        ul {
+            list-style: none outside none;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #eee;
+        }
+
+        body .mainmenu:after {
+            clear: both;
+            content: " ";
+            display: block;
+        }
+
+        body .mainmenu li {
+            float: left;
+            margin-left: 2.5%;
+            margin-top: 2.5%;
+            width: 30%;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        body .mainmenu li a {
+            display: block;
+            color: #FFF;
+            text-align: center
+        }
+
+        body .mainmenu li a b {
+            display: block;
+            height: 180px;
+        }
+
+        body .mainmenu li a img {
+            margin: 15px auto 15px;
+            width: 150px;
+            height: 150px;
+        }
+
+        body .mainmenu li a span {
+            display: block;
+            height: 40px;
+            line-height: 40px;
+            background-color: #FFF;
+            color: #999;
+            font-size: 16px;
+        }
+    </style>
+    <link rel="Stylesheet" type="text/css" href="/css/css.css"/>
+    <script type="text/javascript" src="/js/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="/js/main.js"></script>
+    <script type="text/javascript" src="/js/jquery.slides.js"></script>
+    <script type="text/javascript" src="/js/slider.js"></script>
+</head>
+<body>
+<!------------头部-------------->
+<div class="top_bg" th:replace="common/head::headContent"></div>
+<!------------搜索条-------------->
+<div class="top_bg" th:replace="common/search::searchContent"></div>
+<!------------大屏广告-------------->
+<div class="full pdtb30">
+    <div class="slider_box" id="slider_name">
+        <div class="mask">
+        </div>
+        <ul class="silder_con">
+            <li class="silder_panel"><a href="#" class="f_l">
+                <img src="images/slidepic/1.jpg"/></a></li>
+            <li class="silder_panel"><a href="#" class="f_l">
+                <img src="images/slidepic/2.jpg"/></a></li>
+            <li class="silder_panel"><a href="#" class="f_l">
+                <img src="images/slidepic/3.jpg"/></a></li>
+        </ul>
+        <div class="silder_intro">
+            <h3>YOLO江小白音乐节</h3>
+            <div>
+                <p>你问我为什么可以无畏风雨、因为我是肆意又勇敢的新青年、跟着音乐让你看到我的手、要酷、要潮、要燥！</p>
+            </div>
+        </div>
+        <div class="silder_intro">
+            <h3>街舞</h3>
+            <div>
+                <p>街舞地板动作--breaking</p>
+            </div>
+        </div>
+        <div class="silder_intro">
+            <h3>滑板少年</h3>
+            <div>
+                <p>滑板动作--ollie</p>
+            </div>
+        </div>
+        <ul class="silder_nav dec">
+            <li><a href="#">
+                <img src="images/slidepic/s_1.jpg"/></a></li>
+            <li><a href="#">
+                <img src="images/slidepic/s_1.jpg"/></a></li>
+            <li><a href="#">
+                <img src="images/slidepic/s_1.jpg"/></a></li>
+        </ul>
+    </div>
+</div>
+
+
+<!------------链-------------->
+<div style="margin-bottom: 40px;">
+    <ul class="mainmenu">
+        <li><a href="/article/search"><b><img src="images/tb01.jpg"/></b><span>文章</span></a></li>
+        <li><a href="/perform/search"><b><img src="images/tb05.png"/></b><span>演出</span></a></li>
+        <li><a href="/video/search"><b><img src="images/tb03.png"/></b><span>视频</span></a></li>
+        <!--<li><a href="#" onclick="alert('该功能即将上线,敬请期待')"><b><img src="images/tb04.png"/></b><span>街舞</span></a></li>-->
+        <!--<li><a href="#" onclick="alert('该功能即将上线,敬请期待')"><b><img src="images/tb05.png"/></b><span>说唱</span></a></li>-->
+        <li><a href="/page/user/user_info"><b><img src="images/tb06.png"/></b><span>用户</span></a></li>
+    </ul>
+</div>
+<!------------尾部-------------->
+<div class="footer" th:replace="common/bottom::bottomContent"></div>
+</body>
+</html>

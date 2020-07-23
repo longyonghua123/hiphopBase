@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="pragma" content="no-cache"/>
+    <meta http-equiv="cache-control" content="no-cache"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="description" content="hiphop网站后台管理系统"/>
+    <meta name="author" content="成法荣"/>
+    <link th:href="${#httpServletRequest.getContextPath()+'/res/bootCss/bootstrap.css'}" type="text/css"
+          media="screen" rel="stylesheet"/>
+    <link th:href="${#httpServletRequest.getContextPath()+'/res/bootCss/bootstrap-responsive.css'}"
+          type="text/css" media="screen" rel="stylesheet"/>
+    <link th:href="${#httpServletRequest.getContextPath()+'/res/bootCss/bootstrap-theme.css'}" type="text/css"
+          media="screen" rel="stylesheet"/>
+    <link th:href="${#httpServletRequest.getContextPath()+'/res/bootCss/bootstrap-datetimepicker.css'}"
+          type="text/css" media="screen" rel="stylesheet"/>
+    <!-- Custom styles for this template -->
+    <link th:href="${#httpServletRequest.getContextPath()+'/res/bootCss/sticky-footer-navbar.css'}" rel="stylesheet"/>
+    <link th:href="${#httpServletRequest.getContextPath()+'/res/bootCss/common.css'}" rel="stylesheet"/>
+    <script th:src="${#httpServletRequest.getContextPath()+'/res/bootJs/jquery-1.11.1.js'}"></script>
+    <script th:src="${#httpServletRequest.getContextPath()+'/res/bootJs/locales/moment-with-locales.js'}"></script>
+    <script th:src="${#httpServletRequest.getContextPath()+'/res/bootJs/ie-emulation-modes-warning.js'}"></script>
+    <script th:src="${#httpServletRequest.getContextPath()+'/res/bootJs/bootstrap.js'}"></script>
+    <script th:src="${#httpServletRequest.getContextPath()+'/res/bootJs/bootstrap-datetimepicker.js'}"></script>
+    <script th:src="${#httpServletRequest.getContextPath()+'/res/bootJs/locales/bootstrap-datetimepicker.zh-CN.js'}"></script>
+    <script th:src="${#httpServletRequest.getContextPath()+'/res/bootJs/jquery.validate.js'}"></script>
+    <script th:src="${#httpServletRequest.getContextPath()+'/res/bootJs/additional-methods.js'}"></script>
+    <script th:src="${#httpServletRequest.getContextPath()+'/res/bootJs/jquery.validate.customized.js'}"></script>
+    <script th:src="${#httpServletRequest.getContextPath()+'/res/bootJs/common.js'}"></script>
+    <script th:src="${#httpServletRequest.getContextPath()+'/res/js/base.js'}"></script>
+    <script th:src="${#httpServletRequest.getContextPath()+'/res/js/form/common.js'}"></script>
+    <script th:src="${#httpServletRequest.getContextPath()+'/res/js/manager/info_message.js'}"></script>
+    <script th:src="${#httpServletRequest.getContextPath()+'/res/js/utils.js'}"></script>
+    <script th:inline="javascript">
+        //WEB根目录
+       window.webContextPath=[[${#httpServletRequest.getContextPath()}]];
+       $(function(){
+           $("body").width(window.screen.width);
+       });
+    </script>
+    <title th:text="${title}"></title>
+</head>
+<body>
+<!-- 中间主体内容部分 -->
+<div  class="wrapper" th:include="::content"></div>
+</body>
+</html>
